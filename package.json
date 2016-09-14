@@ -1,0 +1,44 @@
+{
+  "name": "node-auth-react-pg-boilerplate",
+  "version": "0.0.1",
+  "description": "A boilerplate app with basic auth support built with React, Postgres, Express, etc.",
+  "scripts": {
+    "babel-node": "babel-node",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "devstart": "nodemon -w src/server/ src/server/index.js",
+    "devwebpack": "webpack-dev-server",
+    "migrate": "BABEL_ENV=server babel-node ./node_modules/.bin/db-migrate"
+  },
+  "author": "Micah Roberson",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^0.8.7",
+    "bluebird": "^3.4.6",
+    "body-parser": "^1.15.2",
+    "db-migrate": "^0.10.0-beta.16",
+    "db-migrate-pg": "^0.1.10",
+    "dotenv": "^2.0.0",
+    "express": "^4.14.0",
+    "express-promise-router": "^1.1.0",
+    "lodash": "^4.15.0",
+    "node-postgres-named": "^2.4.0",
+    "pg": "^6.1.0",
+    "pg-native": "^1.10.0",
+    "react": "^15.3.1",
+    "react-dom": "^15.3.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.14.0",
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.5",
+    "babel-plugin-transform-class-properties": "^6.11.5",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.14.0",
+    "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-react": "^6.11.1",
+    "babel-register": "^6.14.0",
+    "nodemon": "^1.10.2",
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.15.1"
+  }
+}
