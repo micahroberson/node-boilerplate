@@ -2,7 +2,7 @@ import _ from 'lodash';
 import Promise from 'bluebird';
 import bcrypt from 'bcrypt';
 import BaseRepository from './BaseRepository';
-import User from '../../shared/models/User';
+import User from '../../common/models/User';
 import ParametersInvalidError from '../lib/errors/ParametersInvalidError';
 
 let errorHandler = (error) => {

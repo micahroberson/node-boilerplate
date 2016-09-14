@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import Promise from 'bluebird';
 import bcrypt from 'bcrypt';
-import User from '../../shared/models/User';
-import UserSession from '../../shared/models/UserSession';
+import User from '../../common/models/User';
+import UserSession from '../../common/models/UserSession';
 import ParametersInvalidError from '../lib/errors/ParametersInvalidError';
 import UnauthorizedError from '../lib/errors/UnauthorizedError';
 

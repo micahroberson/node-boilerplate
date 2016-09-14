@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import BaseRepository from './BaseRepository';
-import UserSession from '../../shared/models/UserSession';
+import UserSession from '../../common/models/UserSession';
 import ParametersInvalidError from '../lib/errors/ParametersInvalidError';
 
 class UserSessionsRepository extends BaseRepository {
