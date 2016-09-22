@@ -34,7 +34,7 @@ class RequestContext {
         if(userSession.expires_at && userSession.expires_at < new Date()) {throw new UnauthorizedError({message: 'Your session has expired.'});}
         req.ctx.session = userSession;
         return req.ctx.usersRepository.assignToObjects(userSession)
-          .then((userSession) => {
+          .then(() => {
             return 'next';
           });
       });

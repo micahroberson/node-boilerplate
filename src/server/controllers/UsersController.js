@@ -10,11 +10,15 @@ const InvalidEmailPasswordErrorValues = {message: 'The email/password combinatio
 
 const UsersController = {
   create: (ctx, payload) => {
-    if(!payload.email || !payload.email || !payload.password) {return Promise.reject(new ParametersInvalidError({message: 'name, email and password are all required.'}));}
+    if(!payload.name || !payload.email || !payload.password) {return Promise.reject(new ParametersInvalidError({message: 'name, email and password are all required.'}));}
     let user = new User(payload);
     return ctx.usersRepository.create(user)
       .then((user) => {
-        return serializeUser(user);
+        let session = new UserSession({user_id: user.id});
+        return ctx.userSessionsRepository.create(session)
+          .then((session) => {
+            return Object.assign({session_token: session.id}, serializeUser(user));
+          });
       });
   },
 
@@ -47,8 +51,7 @@ const UsersController = {
       });
   },
 
-  user: (ctx, payload) => {
-    if(ctx.session.user.id !== payload.id) {return Promise.reject(new UnauthorizedError());}
+  me: (ctx, payload) => {
     return Promise.resolve(serializeUser(ctx.session.user));
   }
 };

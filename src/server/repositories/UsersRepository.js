@@ -68,6 +68,12 @@ class UsersRepository extends BaseRepository {
         return db.pquery(`INSERT INTO users (email, name, encrypted_password) VALUES ($email, $name, $encrypted_password) RETURNING *`, this._serializeUserForSQL(user))
           .then((records) => {
             return new User(records[0]);
+          })
+          .catch((error) => {
+            if(error.code === '23505') {
+              error = new ParametersInvalidError({message: 'The email address you entered is already in use'});
+            }
+            throw error;
           });
       });
     });
