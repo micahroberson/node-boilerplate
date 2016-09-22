@@ -46,6 +46,7 @@
     "babel-preset-react-hmre": "^1.1.1",
     "babel-register": "^6.14.0",
     "mocha": "^3.0.2",
+    "mocha-junit-reporter": "^1.12.0",
     "nodemon": "^1.10.2",
     "supertest": "^2.0.0",
     "webpack": "^2.1.0-beta.22",
