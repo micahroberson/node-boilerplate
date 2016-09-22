@@ -1,4 +1,4 @@
-# Node Boilerplate
+# Node Boilerplate [![CircleCI](https://circleci.com/gh/micahroberson/node-boilerplate/tree/master.svg?style=svg)](https://circleci.com/gh/micahroberson/node-boilerplate/tree/master)
 This is a starter kit for new JavaScript web apps. The setup features the following:
 - React, React Router, Fluxible
 - Express.js, PostgreSQL for serving up the app, and JSON APIs
