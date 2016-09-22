@@ -1,0 +1,30 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "plugins": [
+    "react"
+  ],
+  "extends": "eslint:recommended",
+  "rules": {
+    "eol-last": [1],
+    "no-undef": 0,
+    "no-console": 0,
+    "no-unused-vars": 1,
+    "no-redeclare": 1,
+    "semi": 2,
+    // "indent": [2, 2, {"VariableDeclarator": 2, "SwitchCase": 1}],
+    "no-mixed-spaces-and-tabs": 2,
+    "no-trailing-spaces": 2,
+    "block-scoped-var": 2,
+    "args": "none",
+    "callback-return": 2,
+    "handle-callback-err": [2, "^(err|error)$"],
+    "no-cond-assign": 1,
+    "react/jsx-uses-vars": [2]
+  }
+}
+
