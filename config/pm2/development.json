@@ -1,0 +1,38 @@
+{
+  "apps": [
+    {
+      "autorestart": true,
+      "env": {
+        "NODE_ENV": "development",
+        "BABEL_ENV": "server",
+        "PORT": "4000",
+        "POSTGRES_HOST": "localhost",
+        "POSTGRES_DB": "node_boilerplate",
+        "POSTGRES_USER": "node_boilerplate",
+        "POSTGRES_PASSWORD": "password"
+      },
+      "instances": 1,
+      "name": "node-boilerplate",
+      "script": "./src/server/index.js",
+      "watch": [
+        "./src/server",
+        "./src/common"
+      ],
+      "node_args": "-r babel-register"
+    },
+    {
+      "autorestart": true,
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "instances": 1,
+      "name": "node-boilerplate-webpack",
+      "script": "./node_modules/.bin/webpack-dev-server",
+      "args": [
+        "--hot",
+        "--inline",
+        "--config=./config/webpack/dev.js"
+      ]
+    }
+  ]
+}
