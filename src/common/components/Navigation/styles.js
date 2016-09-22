@@ -7,6 +7,10 @@ const styles = StyleSheet.create({
     fontSize: '14px',
     borderBottom: '1px solid rgba(0,0,0,0.15)'
   },
+  innerContainer: {
+    maxWidth: '960px',
+    margin: '0 auto'
+  },
   homeLink: {
     display: 'inline-block',
     width: 200,
