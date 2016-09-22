@@ -3,11 +3,7 @@
   "version": "0.0.1",
   "description": "A Node boilerplate app with basic auth support built with React, Postgres, Express, etc.",
   "scripts": {
-    "babel-node": "babel-node",
-    "test": "BABEL_ENV=server mocha --compilers js:babel-register --timeout 20000 --recursive test",
-    "devstart": "nodemon -w src/server -w src/common src/server/index.js",
-    "devwebpack": "webpack-dev-server --config tools/webpack.client.dev.js --hot --inline",
-    "migrate": "BABEL_ENV=server babel-node ./node_modules/.bin/db-migrate"
+    "test": "make test"
   },
   "author": "Micah Roberson",
   "license": "ISC",
