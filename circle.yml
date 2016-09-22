@@ -1,0 +1,11 @@
+machine
+  node:
+    version: 6.1.0
+  services:
+    - postgresql
+
+database:
+  override:
+    - createuser -s -d node_boilerplate_test
+    - createdb node_boilerplate_test
+
