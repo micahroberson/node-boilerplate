@@ -11,6 +11,8 @@ install:
 
 run-development:
 	@node_modules/.bin/pm2 start ./config/pm2/development.json
+restart-development:
+	@node_modules/.bin/pm2 restart ./config/pm2/development.json
 stop-development:
 	@node_modules/.bin/pm2 delete ./config/pm2/development.json
 logs-development:
