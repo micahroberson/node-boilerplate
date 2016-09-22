@@ -3,9 +3,16 @@
   "sql-file": true,
   "development": {
     "driver": "pg",
-    "user": "development",
+    "user": "node_boilerplate",
     "password": "password",
     "host": "localhost",
-    "database": "development"
+    "database": "node_boilerplate"
+  },
+  "test": {
+    "driver": "pg",
+    "user": "node_boilerplate_test",
+    "password": "password",
+    "host": "localhost",
+    "database": "node_boilerplate_test"
   }
 }
