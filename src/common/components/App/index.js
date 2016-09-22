@@ -1,8 +1,8 @@
 import React from 'react';
 import connectToStores from 'fluxible-addons-react/connectToStores';
-import UserStore from '../stores/UserStore';
-import User from '../models/User';
-import Navigation from './Navigation';
+import UserStore from '../../stores/UserStore';
+import User from '../../models/User';
+import Navigation from '../Navigation';
 
 class App extends React.Component {
   static contextTypes = {

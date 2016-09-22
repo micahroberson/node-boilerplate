@@ -1,5 +1,5 @@
 import React from 'react';
-import User from '../models/User';
+import User from '../../models/User';
 
 class Home extends React.Component {
   static contextTypes = {

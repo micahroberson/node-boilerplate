@@ -3,7 +3,7 @@ import React from 'react';
 import {Link} from 'react-router';
 import {css} from 'aphrodite/no-important';
 import connectToStores from 'fluxible-addons-react/connectToStores';
-import UserActions from '../../actions/UserActions';
+import userActions from '../../actions/userActions';
 import UserStore, {RequestStates} from '../../stores/UserStore';
 import shouldComponentUpdatePure from '../../lib/shouldComponentUpdatePure';
 import styles from './styles';
@@ -56,7 +56,7 @@ class AuthForm extends React.Component {
 
   signIn() {
     this.setState({loading: true});
-    this.context.executeAction(UserActions.signIn, {
+    this.context.executeAction(userActions.signIn, {
       email: this.state.email,
       password: this.state.password
     });
@@ -64,7 +64,7 @@ class AuthForm extends React.Component {
 
   signUp() {
     this.setState({loading: true});
-    this.context.executeAction(UserActions.signUp, {
+    this.context.executeAction(userActions.signUp, {
       name: this.state.name,
       email: this.state.email,
       password: this.state.password
@@ -73,7 +73,7 @@ class AuthForm extends React.Component {
 
   // resetPassword() {
   //   this.setState({loading: true});
-  //   this.context.executeAction(UserActions.sendPasswordResetEmail, {
+  //   this.context.executeAction(userActions.sendPasswordResetEmail, {
   //     email: this.state.email
   //   });
   // }

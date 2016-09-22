@@ -1,7 +1,7 @@
 import {shouldRequireAuthentication} from '../setup';
 
 describe('/users', () => {
-  describe('/', () => {
+  describe('/create', () => {
     before((done) => {
       loadFixtures('user', done);
     });
@@ -9,7 +9,7 @@ describe('/users', () => {
       describe('when the email is already taken', () => {
         it('responds with an error', (done) => {
           request
-            .post('/api/users')
+            .post('/api/users/create')
             .send({
               payload: {
                 email: 'test@example.com',
@@ -29,7 +29,7 @@ describe('/users', () => {
       describe('when a parameter is missing', () => {
         it('responds with an error', (done) => {
           request
-            .post('/api/users')
+            .post('/api/users/create')
             .send({
               payload: {
                 email: 'test2@example.com',
@@ -50,7 +50,7 @@ describe('/users', () => {
     describe('when a valid email & password are provided', () => {
       it('responds with a session_token and user', (done) => {
         request
-          .post('/api/users')
+          .post('/api/users/create')
           .send({
             payload: {
               name: 'Test User 2',

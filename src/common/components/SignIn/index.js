@@ -1,6 +1,6 @@
 import React from 'react';
-import shouldComponentUpdatePure from '../lib/shouldComponentUpdatePure';
-import AuthForm, {Modes} from './AuthForm';
+import shouldComponentUpdatePure from '../../lib/shouldComponentUpdatePure';
+import AuthForm, {Modes} from '../AuthForm';
 
 class SignIn extends React.Component {
   shouldComponentUpdate = shouldComponentUpdatePure;
@@ -10,4 +10,4 @@ class SignIn extends React.Component {
   }
 }
 
-export default SignIn;
+export default SignIn

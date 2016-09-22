@@ -1,6 +1,6 @@
 import React from 'react';
-import AppStore from '../stores/AppStore';
-import colors from '../lib/colors';
+import AppStore from '../../stores/AppStore';
+import colors from '../../lib/colors';
 
 const env = process.env.NODE_ENV;
 const bundleSrc = (env === 'development' ? 'http://localhost:8080/assets/bundle.js' : '/assets/bundle.js');

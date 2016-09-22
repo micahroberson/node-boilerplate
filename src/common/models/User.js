@@ -9,6 +9,13 @@ class User extends Base {
     this.encrypted_password = values.encrypted_password;
     this.password = values.password; // Not persisted
   }
+
+  get first_name() {
+    let name = this.name || '';
+    let fname = name.substr(0, name.indexOf(' '));
+    fname = fname || name;
+    return fname;
+  }
 }
 
 export default User;

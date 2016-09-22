@@ -1,11 +1,11 @@
 import express from 'express';
 import request from 'supertest';
 import chai from 'chai';
-import ApiRouter from '../../src/server/routers/ApiRouter';
+import apiRouter from '../../src/server/routers/apiRouter';
 import RequestContext from '../../src/server/lib/RequestContext';
 
 let server = express();
-server.use('/api', ApiRouter);
+server.use('/api', apiRouter);
 
 let ctx = new RequestContext();
 

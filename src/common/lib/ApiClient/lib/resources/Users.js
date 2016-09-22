@@ -6,7 +6,7 @@ class Users extends Resource {
 
     this.create = Resource.createEndpoint({
       authRequired: false,
-      path: '/users',
+      path: '/users/create',
       method: 'POST'
     });
 
@@ -19,6 +19,12 @@ class Users extends Resource {
     this.me = Resource.createEndpoint({
       authRequired: true,
       path: '/users/me',
+      method: 'POST'
+    });
+
+    this.update = Resource.createEndpoint({
+      authRequired: true,
+      path: '/users/update',
       method: 'POST'
     });
   }
