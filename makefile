@@ -13,6 +13,8 @@ run-development:
 	@node_modules/.bin/pm2 start ./config/pm2/development.json
 stop-development:
 	@node_modules/.bin/pm2 delete ./config/pm2/development.json
+logs-development:
+	@node_modules/.bin/pm2 logs $(RUN_ARGS)
 
 test:
 	@BABEL_ENV=server NODE_ENV=test ./node_modules/.bin/db-migrate reset
