@@ -56,6 +56,23 @@ const userActions = {
         context.dispatch('USER_ME_FAILURE', {error});
         return null;
       });
+  },
+  update: (context, payload) => {
+    context.dispatch('USER_UPDATE_START', null);
+    return context
+      .api
+      .users
+      .update(payload)
+      .then((responsePayload) => {
+        let user = new User(responsePayload.user);
+        context.dispatch('USER_UPDATE_SUCCESS', user);
+        return user;
+      })
+      .catch((error) => {
+        console.log(error);
+        context.dispatch('USER_UPDATE_FAILURE', {error});
+        return null;
+      });
   }
 };
 
