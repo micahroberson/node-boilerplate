@@ -1,5 +1,4 @@
 import React from 'react';
-import AppStore from '../../stores/AppStore';
 import colors from '../../lib/colors';
 
 const env = process.env.NODE_ENV;
