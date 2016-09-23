@@ -19,6 +19,9 @@ class UserStore extends BaseStore {
     'USER_ME_START': 'handleMeStart',
     'USER_ME_SUCCESS': 'handleMeSuccess',
     'USER_ME_FAILURE': 'handleMeFailure',
+    'USER_UPDATE_START': 'handleUpdateStart',
+    'USER_UPDATE_SUCCESS': 'handleUpdateSuccess',
+    'USER_UPDATE_FAILURE': 'handleUpdateFailure',
   };
 
   constructor(dispatcher) {
@@ -76,6 +79,20 @@ class UserStore extends BaseStore {
   handleMeFailure(data) {
     console.log(data.error);
     this.logEventState('ME', RequestStates.Failure, data);
+  }
+
+  handleUpdateStart() {
+    this.logEventState('UPDATE', RequestStates.Started);
+  }
+
+  handleUpdateSuccess(user) {
+    this.currentUser = user;
+    this.logEventState('UPDATE', RequestStates.Success);
+  }
+
+  handleUpdateFailure(data) {
+    console.log(data.error);
+    this.logEventState('UPDATE', RequestStates.Failure, data);
   }
 
   getCurrentUser() {

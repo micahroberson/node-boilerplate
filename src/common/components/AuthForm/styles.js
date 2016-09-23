@@ -15,10 +15,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '100%',
-    border: '1px solid rgba(0,0,0,0.35)',
-    padding: '8px 12px',
-    margin: '0 0 12px',
-    borderRadius: '2px'
+    borderBottom: `1px solid ${colors.black35}`
   },
   submitButton: {
     float: 'left'

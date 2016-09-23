@@ -59,6 +59,8 @@ const styles = StyleSheet.create({
   button: {
     border: 0,
     outline: 0,
+    paddingLeft: 0,
+    paddingRight: 0,
     ':active': {
       outline: 0
     }

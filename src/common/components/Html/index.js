@@ -53,12 +53,17 @@ const BaseCSS = `
     color: ${colors.blackOlive};
     -webkit-font-smoothing: antialiased;
     font-size: 14px;
+    line-height: 1.4;
   }
   h1 {
-
+    font-size: 42px;
+    line-height: 1.2;
+    margin: 0 0 28px;
   }
   h2 {
-
+    font-size: 30px;
+    line-height: 1.1
+    margin: 0 0 20px;
   }
   h3 {
 
@@ -70,28 +75,65 @@ const BaseCSS = `
   input, textarea, button, select, a, label {
     -webkit-tap-highlight-color: rgba(0,0,0,0);
   }
+  input, textarea, select, fieldset {
+    margin: 0;
+    -webkit-appearance: none;
+  }
+  input:active, textarea:active, input:focus, textarea:focus {
+    outline: 0;
+  }
+  input::-webkit-input-placeholder {
+    color: ${colors.black15};
+  }
+  input:-moz-placeholder {
+    color: ${colors.black15};
+  }
+  input::-moz-placeholder {
+    color: ${colors.black15};
+  }
+  input:-ms-input-placeholder {
+    color: ${colors.black15};
+  }
+  input {
+    border: 0;
+    padding: 0;
+    line-height: 34px;
+  }
+  input:disabled {
+    border-color: transparent;
+  }
+  input:focus {
+    border-color: ${colors.black35};
+  }
   fieldset {
     border: 0;
+    margin-bottom: 15px;
   }
   label {
     display: block;
-    margin-bottom: 5px;
+    font-size: 16px;
+    margin-bottom: 0;
+    color: ${colors.lightBlackOlive};
   }
   button {
     border-radius: 2px;
     background-color: #ffffff;
-    border: 1px solid #1c1c1c;
+    border: 0;
     color: #1c1c1c;
     padding: 8px 12px;
     font-size: 14px;
+    font-weight: 500;
   }
-  button.verdigris {
-    background-color: ${colors.verdigris};
+  button.jellyBean {
+    background-color: ${colors.jellyBean};
     color: #ffffff;
-    border-color: ${colors.verdigris};
+    border-color: ${colors.jellyBean};
   }
   button:hover {
     opacity: 0.9;
+  }
+  button:active {
+    outline: none;
   }
   button.blue {
     background-color: ${colors.tuftsBlue};
@@ -116,25 +158,6 @@ const BaseCSS = `
   }
   ol, ul {
     list-style: none;
-  }
-  input, textarea, select, fieldset {
-    margin: 0;
-    -webkit-appearance: none;
-  }
-  input:active, textarea:active, input:focus, textarea:focus {
-    outline: 0;
-  }
-  input::-webkit-input-placeholder {
-    color: #94938f;
-  }
-  input:-moz-placeholder {
-    color: #94938f;
-  }
-  input::-moz-placeholder {
-    color: #94938f;
-  }
-  input:-ms-input-placeholder {
-    color: #94938f;
   }
   .cf::after {
     clear: both;

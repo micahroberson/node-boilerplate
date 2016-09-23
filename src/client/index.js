@@ -17,12 +17,13 @@ app.rehydrate(dehydratedState, (error, context) => {
   if(error) {throw error;}
   window.context = context;
   let mountNode = document.getElementById('app');
+  let componentContext = context.getComponentContext();
   ReactDOM.render(
     React.createElement(
       FluxibleComponent,
-      {context: context.getComponentContext()},
+      {context: componentContext},
       React.createElement(Router, {
-        routes: context.getComponent(),
+        routes: context.getComponent()(componentContext),
         history: browserHistory
       })
     ),

@@ -118,7 +118,7 @@ class AuthForm extends React.Component {
     let nameInputProps = {
       className: css(styles.input),
       type: 'name',
-      placeholder: 'Your full name',
+      placeholder: 'Enter your full name',
       value: name,
       onChange: this.handleOnChangeName.bind(this)
     };
@@ -131,7 +131,7 @@ class AuthForm extends React.Component {
     let emailInputProps = {
       className: css(styles.input),
       type: 'email',
-      placeholder: 'Your email address',
+      placeholder: 'Enter your email address',
       value: email,
       onChange: this.handleOnChangeEmail.bind(this)
     };
@@ -144,7 +144,7 @@ class AuthForm extends React.Component {
     let passwordInputProps = {
       className: css(styles.input),
       type: 'password',
-      placeholder: 'Your password',
+      placeholder: 'Enter a password',
       value: password,
       onChange: this.handleOnChangePassword.bind(this)
     };
@@ -155,7 +155,7 @@ class AuthForm extends React.Component {
       </fieldset>
     );
     let submitButtonProps = {
-      className: `blue ${css(styles.submitButton)}`,
+      className: `jellyBean ${css(styles.submitButton)}`,
       type: 'submit',
       disabled: loading,
       onClick: this.handleOnClickSubmitButton.bind(this)
