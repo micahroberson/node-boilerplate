@@ -20,7 +20,7 @@ class Html extends React.Component {
           <meta name="viewport" content="width=device-width, user-scalable=no" />
           <style type="text/css" dangerouslySetInnerHTML={{__html: NormalizeCSS}}></style>
           <style type="text/css" dangerouslySetInnerHTML={{__html: BaseCSS}}></style>
-          <style data-aphrodite>{this.props.css.content}</style>
+          <style data-aphrodite dangerouslySetInnerHTML={{__html: this.props.css.content}} />
         </head>
         <body>
           <div id="app" dangerouslySetInnerHTML={{__html: this.props.markup}}></div>
