@@ -1,6 +1,6 @@
 import APIError from './APIError';
 
-class UnauthorizedError extends APIError {
+class UnauthorizedAccessError extends APIError {
   constructor(values={}) {
     if(!values.message) {
       values.message = 'Access denied.';
@@ -9,4 +9,4 @@ class UnauthorizedError extends APIError {
   }
 }
 
-export default UnauthorizedError;
+export default UnauthorizedAccessError;

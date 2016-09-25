@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import User from '../../common/models/User';
 import UserSession from '../../common/models/UserSession';
 import ParametersInvalidError from '../lib/errors/ParametersInvalidError';
-import UnauthorizedError from '../lib/errors/UnauthorizedError';
+import UnauthorizedAccessError from '../lib/errors/UnauthorizedAccessError';
 
 const InvalidEmailPasswordErrorValues = {message: 'The email/password combination you provided is invalid.'};
 
@@ -17,7 +17,11 @@ const usersController = {
         let session = new UserSession({user_id: user.id});
         return ctx.userSessionsRepository.create(session)
           .then((session) => {
-            return Object.assign({session_token: session.id}, serializeUser(user));
+            return ctx.providerClients.bullQueueProviderClient.enqueue('SendWelcomeEmail', {user_id: user.id})
+              .then(() => {
+                console.log('finally');
+                return Object.assign({session_token: session.id}, serializeUser(user));
+              });
           });
       });
   },
@@ -44,7 +48,7 @@ const usersController = {
   },
 
   update: (ctx, payload) => {
-    if(ctx.session.user.id !== payload.id) {return Promise.reject(new UnauthorizedError());}
+    if(ctx.session.user.id !== payload.id) {return Promise.reject(new UnauthorizedAccessError());}
     return ctx.usersRepository.update(ctx.session.user, payload)
       .then((user) => {
         return serializeUser(user);

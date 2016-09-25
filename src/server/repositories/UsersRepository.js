@@ -5,50 +5,31 @@ import BaseRepository from './BaseRepository';
 import User from '../../common/models/User';
 import ParametersInvalidError from '../lib/errors/ParametersInvalidError';
 
-let errorHandler = (error) => {
-  if(db.release) {
-    db.release();
-  }
-  throw error;
-};
-
 class UsersRepository extends BaseRepository {
-  findbyId(id) {
-    return this.db().then((db) => {
-      return db.pquery(`SELECT * FROM users WHERE id=$id`, {id})
-        .then((records) => {
-          db.release();
-          if(!records.length) {return null;}
-          let user = new User(records[0]);
-          return user;
-        })
-        .catch(errorHandler);
-    });
+  findById(id) {
+    return this.db.query(`SELECT * FROM users WHERE id=$id`, {id})
+      .then((records) => {
+        if(!records.length) {return null;}
+        let user = new User(records[0]);
+        return user;
+      });
   }
 
   findbyIds(ids) {
-    return this.db().then((db) => {
-      return db.pquery(`SELECT * FROM users WHERE id=ANY($ids)`, {ids})
-        .then((records) => {
-          db.release();
-          return records.map((r) => {return new User(r);});
-        })
-        .catch(errorHandler)
-    })
+    return this.db.query(`SELECT * FROM users WHERE id=ANY($ids)`, {ids})
+      .then((records) => {
+        return records.map((r) => {return new User(r);});
+      });
   }
 
   findbyEmail(email) {
     email = email.toLowerCase().trim();
-    return this.db().then((db) => {
-      return db.pquery(`SELECT * FROM users WHERE email=$email`, {email})
-        .then((records) => {
-          db.release();
-          if(!records.length) {return null;}
-          let user = new User(records[0]);
-          return user;
-        })
-        .catch(errorHandler);
-    });
+    return this.db.query(`SELECT * FROM users WHERE email=$email`, {email})
+      .then((records) => {
+        if(!records.length) {return null;}
+        let user = new User(records[0]);
+        return user;
+      });
   }
 
   create(user) {
@@ -64,34 +45,30 @@ class UsersRepository extends BaseRepository {
         });
       });
     }).then((user) => {
-      return this.db().then((db) => {
-        return db.pquery(`INSERT INTO users (email, name, encrypted_password) VALUES ($email, $name, $encrypted_password) RETURNING *`, this._serializeUserForSQL(user))
-          .then((records) => {
-            return new User(records[0]);
-          })
-          .catch((error) => {
-            if(error.code === '23505') {
-              error = new ParametersInvalidError({message: 'The email address you entered is already in use'});
-            }
-            throw error;
-          });
-      });
+      return this.db.query(`INSERT INTO users (email, name, encrypted_password) VALUES ($email, $name, $encrypted_password) RETURNING *`, this._serializeUserForSQL(user))
+        .then((records) => {
+          return new User(records[0]);
+        })
+        .catch((error) => {
+          if(error.code === '23505') {
+            error = new ParametersInvalidError({message: 'The email address you entered is already in use'});
+          }
+          throw error;
+        });
     });
   }
 
   update(user, payload) {
-    return this.db().then((db) => {
-      let params = _.pick(payload, ['name', 'email']);
-      let strParams = this.stringifyParamsForUpdate(params);
-      // TODO: allow password updates
-      return db.pquery(`UPDATE users SET ${strParams} WHERE id=$id RETURNING *`, {
-        id: user.id,
-        ...params
-        })
-        .then((records) => {
-          return new User(records[0]);
-        });
-    });
+    let params = _.pick(payload, ['name', 'email']);
+    let strParams = this.stringifyParamsForUpdate(params);
+    // TODO: allow password updates
+    return this.db.query(`UPDATE users SET ${strParams} WHERE id=$id RETURNING *`, {
+      id: user.id,
+      ...params
+      })
+      .then((records) => {
+        return new User(records[0]);
+      });
   }
 
   assignToObjects(objects) {
@@ -126,4 +103,4 @@ class UsersRepository extends BaseRepository {
   }
 }
 
-export default UsersRepository;
+export default UsersRepository
