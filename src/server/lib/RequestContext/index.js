@@ -1,44 +1,28 @@
+import _ from 'lodash';
 import Promise from 'bluebird';
-import UsersRepository from '../../repositories/UsersRepository';
-import UserSessionsRepository from '../../repositories/UserSessionsRepository';
-import UnauthorizedError from '../errors/UnauthorizedError';
+import repositories from '../../repositories';
 
 class RequestContext {
-  constructor() {
-    this._usersRepository = null;
-    this._userSessionsRepository = null;
+  constructor({providerClients}) {
     this.session = null;
+    this.providerClients = providerClients;
+    this._initializeRepositories();
   }
 
-  get usersRepository() {
-    if(!this._usersRepository) {
-      this._usersRepository = new UsersRepository();
+  _initializeRepositories() {
+    for(let repoName in repositories) {
+      let repoClass = repositories[repoName];
+      let instanceName = _.lowerFirst(repoName);
+      this[instanceName] = new repoClass(this);
     }
-    return this._usersRepository;
+    return null;
   }
 
-  get userSessionsRepository() {
-    if(!this._userSessionsRepository) {
-      this._userSessionsRepository = new UserSessionsRepository();
-    }
-    return this._userSessionsRepository;
-  }
-
-  static authorize(req, res) {
-    if(!req.headers.authorization) {return Promise.reject(new UnauthorizedError({message: 'Authorization header is missing.'}));}
-    let encodedUserSessionId = req.headers.authorization.split(' ')[1];
-    let id = new Buffer(encodedUserSessionId, 'base64').toString('utf8');
-    return req.ctx.userSessionsRepository.findbyId(id)
-      .then((userSession) => {
-        if(!userSession) {throw new UnauthorizedError();}
-        if(userSession.expires_at && userSession.expires_at < new Date()) {throw new UnauthorizedError({message: 'Your session has expired.'});}
-        req.ctx.session = userSession;
-        return req.ctx.usersRepository.assignToObjects(userSession)
-          .then(() => {
-            return 'next';
-          });
-      });
+  close() {
+    return Promise.all(_.map(this.providerClients, (providerClient) => {
+      return providerClient.close();
+    }));
   }
 }
 
-export default RequestContext;
+export default RequestContext

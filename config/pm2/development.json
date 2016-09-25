@@ -9,10 +9,11 @@
         "POSTGRES_HOST": "localhost",
         "POSTGRES_DB": "node_boilerplate",
         "POSTGRES_USER": "node_boilerplate",
-        "POSTGRES_PASSWORD": "password"
+        "POSTGRES_PASSWORD": "password",
+        "REDIS_URL": "redis://localhost:6379"
       },
       "instances": 1,
-      "name": "node-boilerplate",
+      "name": "web",
       "script": "./src/server/index.js",
       "watch": [
         "./src/server",
@@ -23,10 +24,29 @@
     {
       "autorestart": true,
       "env": {
+        "NODE_ENV": "development",
+        "BABEL_ENV": "server",
+        "POSTGRES_HOST": "localhost",
+        "POSTGRES_DB": "node_boilerplate",
+        "POSTGRES_USER": "node_boilerplate",
+        "POSTGRES_PASSWORD": "password",
+        "REDIS_URL": "redis://localhost:6379"
+      },
+      "instances": 1,
+      "name": "worker",
+      "script": "./src/server/worker.js",
+      "watch": [
+        "./src/server"
+      ],
+      "node_args": "-r babel-register"
+    },
+    {
+      "autorestart": true,
+      "env": {
         "NODE_ENV": "development"
       },
       "instances": 1,
-      "name": "node-boilerplate-webpack",
+      "name": "webpack",
       "script": "./node_modules/.bin/webpack-dev-server",
       "args": [
         "--hot",
