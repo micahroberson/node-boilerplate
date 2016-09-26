@@ -6,6 +6,8 @@ import RequestContext from '../lib/RequestContext';
 const env = process.env.NODE_ENV;
 const config = require(`./environments/${env}`).default;
 
+// console.log('CONFIG: ', config);
+
 class Environment {
   constructor() {
     this.providers = {};

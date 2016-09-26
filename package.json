@@ -24,6 +24,7 @@
     "history": "^4.0.1",
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.15.0",
+    "mandrill-api": "^1.0.45",
     "node-postgres-named": "^2.4.0",
     "pg": "^6.1.0",
     "pg-native": "^1.10.0",
