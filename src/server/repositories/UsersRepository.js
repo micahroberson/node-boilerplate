@@ -1,15 +1,30 @@
 import _ from 'lodash';
 import Promise from 'bluebird';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import BaseRepository from './BaseRepository';
 import User from '../../common/models/User';
 import ParametersInvalidError from '../lib/errors/ParametersInvalidError';
 
 class UsersRepository extends BaseRepository {
-  findById(id) {
+  find(values={}) {
+    let conditions = _.map((str, val, key) => {
+      return str += `${key} = $${key}`;
+    });
+    let conditionsStr = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ``;
+    return this.db.query(`SELECT * FROM users ${conditionsStr}`, values)
+      .then((records) => {
+        return records.map((r) => {return new User(r);});
+      });
+  }
+
+  findById(id, errorOnNotFound=false) {
     return this.db.query(`SELECT * FROM users WHERE id=$id`, {id})
       .then((records) => {
-        if(!records.length) {return null;}
+        if(!(records && records.length)) {
+          if(!errorOnNotFound) {return null;}
+          throw new ParametersInvalidError('Invalid user id');
+        }
         let user = new User(records[0]);
         return user;
       });
@@ -35,39 +50,44 @@ class UsersRepository extends BaseRepository {
   create(user) {
     // TODO: Validation
     if(user.password.length < 8) {return Promise.reject(new ParametersInvalidError({message: 'Password is too short. Minimum 8 characters is required.'}));}
-    return new Promise((resolve, reject) => {
-      bcrypt.genSalt(10, (error, salt) => {
-        if(error) {return reject(error);}
-        bcrypt.hash(user.password, salt, (error, encryptedPassword) => {
-          if(error) {return reject(error);}
-          user.encrypted_password = encryptedPassword;
-          return resolve(user);
-        });
+    return this._setEncryptedPassword(user)
+      .then((user) => {
+        return this.db.query(`INSERT INTO users (email, name, encrypted_password) VALUES ($email, $name, $encrypted_password) RETURNING *`, this._serializeUserForSQL(user))
+          .then((records) => {
+            return new User(records[0]);
+          })
+          .catch((error) => {
+            if(error.code === '23505') {
+              error = new ParametersInvalidError({message: 'The email address you entered is already in use'});
+            }
+            throw error;
+          });
       });
-    }).then((user) => {
-      return this.db.query(`INSERT INTO users (email, name, encrypted_password) VALUES ($email, $name, $encrypted_password) RETURNING *`, this._serializeUserForSQL(user))
-        .then((records) => {
-          return new User(records[0]);
-        })
-        .catch((error) => {
-          if(error.code === '23505') {
-            error = new ParametersInvalidError({message: 'The email address you entered is already in use'});
-          }
-          throw error;
-        });
-    });
   }
 
   update(user, payload) {
-    let params = _.pick(payload, ['name', 'email']);
-    let strParams = this.stringifyParamsForUpdate(params);
-    // TODO: allow password updates
-    return this.db.query(`UPDATE users SET ${strParams} WHERE id=$id RETURNING *`, {
-      id: user.id,
-      ...params
-      })
-      .then((records) => {
-        return new User(records[0]);
+    return this._setEncryptedPassword(payload)
+      .then((payload) => {
+        let params = _.pick(payload, [
+          'name',
+          'email',
+          'email_verification_token',
+          'email_verification_token_sent_at',
+          'email_verified_at',
+          'password_reset_token',
+          'password_reset_token_sent_at',
+          'password_reset_token_redeemed_at',
+          'encrypted_password'
+        ]);
+
+        let strParams = this.stringifyParamsForUpdate(params);
+        return this.db.query(`UPDATE users SET ${strParams} WHERE id=$id RETURNING *`, {
+          id: user.id,
+          ...params
+          })
+          .then((records) => {
+            return new User(records[0]);
+          });
       });
   }
 
@@ -92,6 +112,74 @@ class UsersRepository extends BaseRepository {
         }
         return objects;
       });
+  }
+
+  sendWelcomeEmail(user) {
+    let options = {
+      templateName: 'basic',
+      subject: 'Welcome to Node Boilerplate!',
+      to: [{
+        email: user.email,
+        name: user.name
+      }],
+      mergeVars: [{
+        rcpt: user.email,
+        vars: [
+          {name: 'body', content: {
+            html: `Welcome to Node Boilerplate, please click the link below to verify your email address.`,
+            cta: {
+              // TODO: Add domains to environment config
+              url: `http://localhost:4000/verify-email/${user.email_verification_token}`,
+              text: 'Verify'
+            }
+          }}
+        ]
+      }]
+    };
+    return this.mailer.send(options);
+  }
+
+  sendResetPasswordEmail(user) {
+    let options = {
+      templateName: 'basic',
+      subject: 'Reset Your Node Boilerplate Password',
+      to: [{
+        email: user.email,
+        name: user.name
+      }],
+      mergeVars: [{
+        rcpt: user.email,
+        vars: [
+          {name: 'body', content: {
+            html: `Hi ${user.first_name},<br/><br/>You may use the link below to set a new password for your Node Boilerplate account. If you did not request a password reset, please ignore this email and your password will remain the same.`,
+            cta: {
+              // TODO: Add domains to environment config
+              url: `http://localhost:4000/reset-password/${user.password_reset_token}`,
+              text: 'Reset my password'
+            }
+          }}
+        ]
+      }]
+    };
+    return this.mailer.send(options);
+  }
+
+  genUrlSafeBase64(n=32) {
+    return crypto.randomBytes(n).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '');
+  }
+
+  _setEncryptedPassword(object) {
+    if(!object.password) {return Promise.resolve(object);}
+    return new Promise((resolve, reject) => {
+      bcrypt.genSalt(10, (error, salt) => {
+        if(error) {return reject(error);}
+        bcrypt.hash(object.password, salt, (error, encryptedPassword) => {
+          if(error) {return reject(error);}
+          object.encrypted_password = encryptedPassword;
+          return resolve(object);
+        });
+      });
+    });
   }
 
   _serializeUserForSQL(user) {

@@ -1,5 +1,4 @@
 import express from 'express';
-import Promise from 'bluebird';
 import serialize from 'serialize-javascript';
 import CookieDough from 'cookie-dough';
 import cookieParser from 'cookie-parser';

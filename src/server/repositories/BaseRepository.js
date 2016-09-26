@@ -1,10 +1,10 @@
 import _ from 'lodash';
-import Promise from 'bluebird';
 
 class BaseRepository {
   constructor(ctx) {
     this.db = ctx.providerClients.postgresProviderClient;
     this.queue = ctx.providerClients.bullQueueProviderClient;
+    this.mailer = ctx.providerClients.mailerProviderClient;
   }
 
   stringifyParamsForUpdate(params) {

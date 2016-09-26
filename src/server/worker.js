@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import Environment from './config/Environment';
 import jobs from './jobs';
 import providers from './providers';
@@ -9,7 +10,7 @@ environment.load(providers)
       .then((ctx) => {
         console.log('Starting worker...');
         return ctx.providerClients.bullQueueProviderClient.process((job) => {
-          console.log('Processing...', job);
+          console.log('Processing...');
           if(!jobs[job.data.job_class]) {
             return Promise.reject(new Error(`Job class not found "${job.data.job_class}"`));
           }

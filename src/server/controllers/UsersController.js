@@ -7,6 +7,7 @@ import ParametersInvalidError from '../lib/errors/ParametersInvalidError';
 import UnauthorizedAccessError from '../lib/errors/UnauthorizedAccessError';
 
 const InvalidEmailPasswordErrorValues = {message: 'The email/password combination you provided is invalid.'};
+const ONE_DAY = 60 * 60 * 24 * 1000;
 
 const usersController = {
   create: (ctx, payload) => {
@@ -57,6 +58,47 @@ const usersController = {
 
   me: (ctx, payload) => {
     return Promise.resolve(serializeUser(ctx.session.user));
+  },
+
+  sendResetPasswordEmail: (ctx, payload) => {
+    return ctx.usersRepository.findbyEmail(payload.email)
+      .then((user) => {
+        if(!user) {return Promise.reject(new ParametersInvalidError(`We don't have any accounts linked to '${payload.email}'`));}
+        return ctx.providerClients.bullQueueProviderClient
+          .enqueue('SendPasswordResetEmail', {user_id: user.id})
+          .then(() => {
+            return {};
+          });
+      });
+  },
+
+  resetPassword: (ctx, payload) => {
+    return ctx.usersRepository.find({password_reset_token: payload.password_reset_token})
+      .then((user) => {
+        if(!user) {
+          return Promise.reject(new ParametersInvalidError('The token you provided is invalid.'));
+        }
+        if((new Date()) - user.password_reset_token_sent_at > ONE_DAY) {
+          return Promise.reject(new ParametersInvalidError('The token you provided has expired.'));
+        }
+        return ctx.usersRepository.update(user, {password: payload.password})
+          .then((user) => {
+            return {};
+          });
+      });
+  },
+
+  verifyEmail: (ctx, payload) => {
+    return ctx.usersRepository.find({email_verification_token: payload.email_verification_token})
+      .then((user) => {
+        if(!user) {
+          return Promise.reject(new ParametersInvalidError('The token you provided is invalid.'));
+        }
+        return ctx.usersRepository.update(user, {email_verified_at: new Date()})
+          .then((user) => {
+            return {email: user.email};
+          });
+      });
   }
 };
 

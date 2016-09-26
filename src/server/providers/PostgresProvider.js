@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import BaseProvider, {BaseProviderClient} from './BaseProvider';
 import pg from 'pg';
 import named from 'node-postgres-named';
@@ -10,7 +11,7 @@ class PostgresProvider extends BaseProvider {
       password: this.config.POSTGRES_PASSWORD,
       database: this.config.POSTGRES_DB,
       max: 10,
-      Promise
+      Promise: Promise
     });
     return Promise.resolve(null);
   }

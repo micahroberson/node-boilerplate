@@ -1,4 +1,5 @@
 import Promise from 'bluebird';
+import crypto from 'crypto';
 import BaseRepository from './BaseRepository';
 import UserSession from '../../common/models/UserSession';
 import ParametersInvalidError from '../lib/errors/ParametersInvalidError';
@@ -16,6 +17,9 @@ class UserSessionsRepository extends BaseRepository {
   create(userSession) {
     // TODO: Validation
     if(!userSession.user_id) {return Promise.reject(new ParametersInvalidError({message: 'UserSession must have a user_id fk.'}));}
+    if(!userSession.id) {
+      userSession.id = crypto.randomBytes(32).toString('base64');
+    }
     return this.db.query(`INSERT INTO user_sessions (id, user_id, expires_at) VALUES ($id, $user_id, $expires_at) RETURNING *`, this._serializeUserSessionForSQL(userSession))
       .then((records) => {
         return new UserSession(records[0]);

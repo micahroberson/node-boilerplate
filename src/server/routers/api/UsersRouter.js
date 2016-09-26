@@ -9,6 +9,8 @@ class UsersRouter extends BaseApiRouter {
     this.routes.post('/create', this.controllerActionHandler(usersController.create));
     this.routes.post('/me', this.authorize, this.controllerActionHandler(usersController.me));
     this.routes.post('/update', this.authorize, this.controllerActionHandler(usersController.update));
+    this.routes.post('/send-password-reset-email', this.controllerActionHandler(usersController.sendResetPasswordEmail));
+    this.routes.post('/reset-password', this.controllerActionHandler(usersController.resetPassword));
   }
 }
 

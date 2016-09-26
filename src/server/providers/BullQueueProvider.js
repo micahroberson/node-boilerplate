@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import BaseProvider, {BaseProviderClient} from './BaseProvider';
 import BullQueue from 'bull';
 
