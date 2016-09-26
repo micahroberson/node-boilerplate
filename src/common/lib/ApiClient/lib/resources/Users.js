@@ -27,6 +27,18 @@ class Users extends Resource {
       path: '/users/update',
       method: 'POST'
     });
+
+    this.sendPasswordResetEmail = Resource.createEndpoint({
+      authRequired: false,
+      path: '/users/send-password-reset-email',
+      method: 'POST'
+    });
+
+    this.resetPassword = Resource.createEndpoint({
+      authRequired: false,
+      path: '/users/reset-password',
+      method: 'POST'
+    });
   }
 }
 

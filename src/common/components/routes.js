@@ -5,6 +5,8 @@ import App from './App';
 import Home from './Home';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
+import ForgotPassword from './ForgotPassword';
+import ResetPassword from './ResetPassword';
 import Settings from './Settings';
 
 let routes = (componentContext) => {
@@ -23,6 +25,8 @@ let routes = (componentContext) => {
     <Route path="/" component={App}>
       <Route path="/sign-in" component={SignIn} />
       <Route path="/sign-up" component={SignUp} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password/:token" component={ResetPassword} />
       <Route path="/settings" component={getWrapperComponent(Settings)} onEnter={requireAuthentication}/>
       <IndexRoute component={Home} />
     </Route>

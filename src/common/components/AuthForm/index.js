@@ -11,20 +11,25 @@ import styles from './styles';
 export const Modes = {
   SignIn: 'sign_in',
   SignUp: 'sign_up',
-  // ResetPassword: 'reset_password'
+  ForgotPassword: 'forgot_password',
+  ResetPassword: 'reset_password',
+  ResetPasswordLinkSent: 'reset_password_link_sent',
+  PasswordUpdated: 'password_updated'
 };
 
 const ModeEventMap = {
   [Modes.SignIn]: 'SIGN_IN',
   [Modes.SignUp]: 'SIGN_UP',
-  [Modes.ResetPassword]: 'SEND_PASSWORD_RESET_EMAIL'
+  [Modes.ForgotPassword]: 'SEND_PASSWORD_RESET_EMAIL',
+  [Modes.ResetPassword]: 'RESET_PASSWORD'
 };
 
 class AuthForm extends React.Component {
   static propTypes = {
     requestState: React.PropTypes.string,
     error: React.PropTypes.object,
-    mode: React.PropTypes.oneOf(_.values(Modes))
+    mode: React.PropTypes.oneOf(_.values(Modes)),
+    passwordResetToken: React.PropTypes.string // If mode == ResetPassword
   };
 
   static defaultProps = {
@@ -35,22 +40,54 @@ class AuthForm extends React.Component {
     executeAction: React.PropTypes.func
   };
 
-  shouldComponentUpdate = shouldComponentUpdatePure;
-
   constructor(props) {
     super(props);
 
-    this.state = {
+    this.state = _.extend({
       name: '',
       email: '',
       password: '',
       loading: false
-    };
+    }, this.getStateFromProps(props));
+  }
+
+  shouldComponentUpdate = shouldComponentUpdatePure;
+
+  componentWillReceiveProps(nextProps) {
+    if(this.props.mode !== nextProps.mode) {
+      this.setState({mdoe: nextProps.mode});
+    }
+    if(this.props.mode === Modes.ForgotPassword &&
+      this.props.requestState === RequestStates.Started &&
+      nextProps.requestState === RequestStates.Success) {
+      this.setState({mode: Modes.ResetPasswordLinkSent});
+    } else if(this.props.mode === Modes.ResetPassword &&
+      this.props.requestState === RequestStates.Started &&
+      nextProps.requestState === RequestStates.Success) {
+      this.setState({mode: Modes.PasswordUpdated});
+    }
   }
 
   componentWillReceiveProps(nextProps) {
     if(this.state.loading && (nextProps.requestState !== RequestStates.Started)) {
       this.setState({loading: false});
+    }
+  }
+
+  getStateFromProps(props) {
+    return {mode: props.mode};
+  }
+
+  submit() {
+    switch(this.state.mode) {
+      case Modes.SignIn:
+        return this.signIn();
+      case Modes.SignUp:
+        return this.signUp();
+      case Modes.ForgotPassword:
+        return this.sendPasswordResetEmail();
+      case Modes.ResetPassword:
+        return this.resetPassword();
     }
   }
 
@@ -71,12 +108,20 @@ class AuthForm extends React.Component {
     });
   }
 
-  // resetPassword() {
-  //   this.setState({loading: true});
-  //   this.context.executeAction(userActions.sendPasswordResetEmail, {
-  //     email: this.state.email
-  //   });
-  // }
+  sendPasswordResetEmail() {
+    this.setState({loading: true});
+    this.context.executeAction(userActions.sendPasswordResetEmail, {
+      email: this.state.email
+    });
+  }
+
+  resetPassword() {
+    this.setState({loading: true});
+    this.context.executeAction(userActions.resetPassword, {
+      password: this.state.password,
+      password_reset_token: this.props.passwordResetToken
+    });
+  }
 
   handleOnChangeEmail(e) {
     this.setState({email: e.target.value});
@@ -91,18 +136,13 @@ class AuthForm extends React.Component {
   }
 
   handleOnClickSubmitButton(e) {
-    switch(this.props.mode) {
-      case Modes.SignIn:
-        return this.signIn();
-      case Modes.SignUp:
-        return this.signUp();
-      // case Modes.ResetPassword:
-      //   return this.resetPassword();
-    }
+    this.submit();
   }
 
   handleOnSubmitForm(e) {
-    this.signIn();
+    e.stopPropagation();
+    e.preventDefault();
+    this.submit();
   }
 
   renderError() {
@@ -112,9 +152,8 @@ class AuthForm extends React.Component {
   }
 
   render() {
-    let {name, email, password, loading} = this.state;
-    let {mode} = this.props;
-    let headerText, buttonText, altModeLinks, fieldsets;
+    let {name, email, password, loading, mode} = this.state;
+    let headerText, subheaderText, buttonText, altModeLinks, fieldsets;
     let nameInputProps = {
       className: css(styles.input),
       type: 'name',
@@ -178,30 +217,50 @@ class AuthForm extends React.Component {
         buttonText = headerText = 'Sign in';
         fieldsets = [emailFieldset, passwordFieldset];
         altModeLinks = [
-          <p key="signUpLink" className={css(styles.altLinkWrapper)}>Not registered? <Link {...signUpLinkProps}>Sign up</Link></p>
+          <p key="signUpLink" className={css(styles.altLinkWrapper)}>Not registered? <Link {...signUpLinkProps}>Sign up</Link></p>,
+          <p key="forgotPasswordLink" className={css(styles.altLinkWrapper)}>Forgot password? <Link {...forgotPasswordLinkProps}>Reset it</Link></p>
         ];
         break;
       case Modes.SignUp:
         buttonText = headerText = 'Sign up';
         fieldsets = [nameFieldset, emailFieldset, passwordFieldset];
         altModeLinks = [
-          <p key="signInLink" className={css(styles.altLinkWrapper)}>Already have an account? <Link {...signInLinkProps}>Sign in</Link></p>
+          <p key="signInLink" className={css(styles.altLinkWrapper)}>Already have an account? <Link {...signInLinkProps}>Sign in</Link></p>,
+          <p key="forgotPasswordLink" className={css(styles.altLinkWrapper)}>Forgot password? <Link {...forgotPasswordLinkProps}>Reset it</Link></p>
         ];
         break;
-      // case Modes.ResetPassword:
-      //   break;
-      //<Link {...forgotPasswordLinkProps}>Forgot your password?</Link>
+      case Modes.ForgotPassword:
+        buttonText = headerText = 'Send reset password instructions';
+        fieldsets = [emailFieldset];
+        altModeLinks = [
+          <p key="signInLink" className={css(styles.altLinkWrapper)}>Already have an account? <Link {...signInLinkProps}>Sign in</Link></p>,
+          <p key="signUpLink" className={css(styles.altLinkWrapper)}>Not registered? <Link {...signUpLinkProps}>Sign up</Link></p>
+        ];
+        break;
+      case Modes.ResetPassword:
+        buttonText = headerText = 'Reset my password';
+        fieldsets = [passwordFieldset];
+        break;
+      case Modes.ResetPasswordLinkSent:
+        headerText = 'Send reset password instructions';
+        subheaderText = `We've emailed instructions for resetting your password to ${email}. Please check for email to proceed.`;
+        break;
+      case Modes.PasswordUpdated:
+        headerText = 'Reset my password';
+        subheaderText = `You're password has been updated successfullly. You may now login with your email and new password.`;
+        break;
     }
     return (
       <div className={css(styles.signIn)}>
         <h1 className={css(styles.signInHeader)}>{headerText}</h1>
+        {subheaderText ? <p className={css(styles.subheader)}>{subheaderText}</p> : null}
         {this.renderError()}
         <form onSubmit={this.handleOnSubmitForm.bind(this)}>
           {fieldsets}
-          <div className="cf">
-            <button {...submitButtonProps}>{buttonText}</button>
-            {altModeLinks}
+          <div className={css(styles.buttonWrapper)}>
+            {buttonText ? <button {...submitButtonProps}>{buttonText}</button> : null}
           </div>
+          {altModeLinks}
         </form>
       </div>
     );

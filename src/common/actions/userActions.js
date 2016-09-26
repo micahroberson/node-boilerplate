@@ -73,6 +73,38 @@ const userActions = {
         context.dispatch('USER_UPDATE_FAILURE', {error});
         return null;
       });
+  },
+  sendPasswordResetEmail: (context, payload) => {
+    context.dispatch('USER_SEND_PASSWORD_RESET_EMAIL_START', null);
+    return context
+      .api
+      .users
+      .sendPasswordResetEmail(payload)
+      .then((responsePayload) => {
+        context.dispatch('USER_SEND_PASSWORD_RESET_EMAIL_SUCCESS', {});
+        return {};
+      })
+      .catch((error) => {
+        console.log(error);
+        context.dispatch('USER_SEND_PASSWORD_RESET_EMAIL_FAILURE', {error});
+        return null;
+      });
+  },
+  resetPassword: (context, payload) => {
+    context.dispatch('USER_RESET_PASSWORD_EMAIL_START', null);
+    return context
+      .api
+      .users
+      .resetPassword(payload)
+      .then((responsePayload) => {
+        context.dispatch('USER_RESET_PASSWORD_EMAIL_SUCCESS', {});
+        return {};
+      })
+      .catch((error) => {
+        console.log(error);
+        context.dispatch('USER_RESET_PASSWORD_EMAIL_FAILURE', {error});
+        return null;
+      });
   }
 };
 

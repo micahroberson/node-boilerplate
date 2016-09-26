@@ -22,6 +22,12 @@ class UserStore extends BaseStore {
     'USER_UPDATE_START': 'handleUpdateStart',
     'USER_UPDATE_SUCCESS': 'handleUpdateSuccess',
     'USER_UPDATE_FAILURE': 'handleUpdateFailure',
+    'USER_SEND_PASSWORD_RESET_EMAIL_START': 'handleSendPasswordResetEmailStart',
+    'USER_SEND_PASSWORD_RESET_EMAIL_SUCCESS': 'handleSendPasswordResetEmailSuccess',
+    'USER_SEND_PASSWORD_RESET_EMAIL_FAILURE': 'handleSendPasswordResetEmailFailure',
+    'USER_RESET_PASSWORD_START': 'handleResetPasswordStart',
+    'USER_RESET_PASSWORD_SUCCESS': 'handleResetPasswordSuccess',
+    'USER_RESET_PASSWORD_FAILURE': 'handleResetPasswordFailure',
   };
 
   constructor(dispatcher) {
@@ -93,6 +99,32 @@ class UserStore extends BaseStore {
   handleUpdateFailure(data) {
     console.log(data.error);
     this.logEventState('UPDATE', RequestStates.Failure, data);
+  }
+
+  handleSendPasswordResetEmailStart() {
+    this.logEventState('SEND_PASSWORD_RESET_EMAIL', RequestStates.Started);
+  }
+
+  handleSendPasswordResetEmailSuccess() {
+    this.logEventState('SEND_PASSWORD_RESET_EMAIL', RequestStates.Success);
+  }
+
+  handleSendPasswordResetEmailFailure(data) {
+    console.log(data.error);
+    this.logEventState('SEND_PASSWORD_RESET_EMAIL', RequestStates.Failure, data);
+  }
+
+  handleResetPasswordStart() {
+    this.logEventState('RESET_PASSWORD', RequestStates.Started);
+  }
+
+  handleResetPasswordSuccess() {
+    this.logEventState('RESET_PASSWORD', RequestStates.Success);
+  }
+
+  handleResetPasswordFailure(data) {
+    console.log(data.error);
+    this.logEventState('RESET_PASSWORD', RequestStates.Failure, data);
   }
 
   getCurrentUser() {

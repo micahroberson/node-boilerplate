@@ -18,15 +18,19 @@ const styles = StyleSheet.create({
     borderBottom: `1px solid ${colors.black35}`
   },
   submitButton: {
-    float: 'left'
+
+  },
+  buttonWrapper: {
+    textAlign: 'center',
+    margin: '30px 0 20px'
   },
   altLinkWrapper: {
-    float: 'right',
-    padding: '10px 0',
+    textAlign: 'center',
+    padding: '0',
     fontSize: 12
   },
   altLink: {
-    color: colors.tuftsBlue
+    color: colors.jellyBean
   },
   error: {
     color: colors.jellyBean,
