@@ -1,24 +1,13 @@
 import Promise from 'bluebird';
+import BaseProvider, {BaseProviderClient} from './BaseProvider';
 
-class BullQueueProvider {
-  connect() {
-    return Promise.resolve(null);
-  }
-
-  disconnect() {
-    return Promise.resolve(null);
-  }
-
+class BullQueueProvider extends BaseProvider {
   acquireClient() {
     return Promise.resolve(new BullQueueProviderClient());
   }
 }
 
-class BullQueueProviderClient {
-  close() {
-    return Promise.resolve(null);
-  }
-
+class BullQueueProviderClient extends BaseProviderClient {
   process(cb) {
     cb();
   }

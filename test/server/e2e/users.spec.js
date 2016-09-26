@@ -202,4 +202,158 @@ describe('/users', () => {
       });
     });
   });
+  describe('/send-password-reset-email', () => {
+    before((done) => {
+      loadFixtures('user', done);
+    });
+    describe('when an invalid email is provided', () => {
+      it('responds with an error', (done) => {
+        request
+          .post('/api/users/send-password-reset-email')
+          .send({
+            payload: {
+              email: 'test1234@example.com'
+            }
+          })
+          .expect(200)
+          .expect((res) => {
+            expect(res.body).to.have.property('success');
+            expect(res.body).to.have.property('error');
+            expect(res.body.error).to.have.property('name');
+            expect(res.body.error.name).to.equal('ParametersInvalidError');
+          })
+          .end(done);
+      });
+    });
+    describe('when a valid email is provided', () => {
+      it('responds with success', (done) => {
+        request
+          .post('/api/users/send-password-reset-email')
+          .send({
+            payload: {
+              email: 'test@example.com'
+            }
+          })
+          .expect(200)
+          .expect((res) => {
+            expect(res.body).to.have.property('success');
+            expect(res.body.success).to.be.true;
+            expect(res.body).to.have.property('payload');
+            expect(res.body.payload).to.deep.equal({});
+          })
+          .end(done);
+      });
+    });
+  });
+  describe('/reset-password', () => {
+    before((done) => {
+      loadFixtures('user', done);
+    });
+    describe('when an invalid token is provided', () => {
+      it('responds with an error', (done) => {
+        request
+          .post('/api/users/reset-password')
+          .send({
+            payload: {
+              password_reset_token: '12345',
+              password: 'password2'
+            }
+          })
+          .expect(200)
+          .expect((res) => {
+            expect(res.body).to.have.property('success');
+            expect(res.body).to.have.property('error');
+            expect(res.body.error).to.have.property('name');
+            expect(res.body.error.name).to.equal('ParametersInvalidError');
+            expect(res.body.error.message).to.match(/invalid/);
+          })
+          .end(done);
+      });
+    });
+    describe('when an expired token is provided', () => {
+      it('responds with an error', (done) => {
+        request
+          .post('/api/users/reset-password')
+          .send({
+            payload: {
+              password_reset_token: '222gX_APu7DnUrkZkH4VilvSy8U9uLXbt6wdtR_dzlo',
+              password: 'password2'
+            }
+          })
+          .expect(200)
+          .expect((res) => {
+            expect(res.body).to.have.property('success');
+            expect(res.body).to.have.property('error');
+            expect(res.body.error).to.have.property('name');
+            expect(res.body.error.name).to.equal('ParametersInvalidError');
+            expect(res.body.error.message).to.match(/expired/);
+          })
+          .end(done);
+      });
+    });
+    describe('when a valid token is provided', () => {
+      it('responds with success', (done) => {
+        request
+          .post('/api/users/reset-password')
+          .send({
+            payload: {
+              password_reset_token: 'C_egX_APu7DnUrkZkH4VilvSy8U9uLXbt6wdtR_dzlo',
+              password: 'password2'
+            }
+          })
+          .expect(200)
+          .expect((res) => {
+            expect(res.body).to.have.property('success');
+            expect(res.body.success).to.be.true;
+            expect(res.body).to.have.property('payload');
+            expect(res.body.payload).to.deep.equal({});
+          })
+          .end(done);
+      });
+    });
+  });
+  describe('/verify-email', () => {
+    before((done) => {
+      loadFixtures('user', done);
+    });
+    describe('when an invalid token is provided', () => {
+      it('responds with an error', (done) => {
+        request
+          .post('/api/users/verify-email')
+          .send({
+            payload: {
+              email_verification_token: '12345'
+            }
+          })
+          .expect(200)
+          .expect((res) => {
+            expect(res.body).to.have.property('success');
+            expect(res.body.success).to.be.false;
+            expect(res.body).to.have.property('error');
+            expect(res.body.error).to.have.property('name');
+            expect(res.body.error.name).to.equal('ParametersInvalidError');
+          })
+          .end(done);
+      });
+    });
+    describe('when a valid token is provided', () => {
+      it('responds with success', (done) => {
+        request
+          .post('/api/users/verify-email')
+          .send({
+            payload: {
+              email_verification_token: 'EoFj5i7EjMEYiGkYAipl9lE_aP6lLdTeBW8oYVLZSvo'
+            }
+          })
+          .expect(200)
+          .expect((res) => {
+            expect(res.body).to.have.property('success');
+            expect(res.body.success).to.be.true;
+            expect(res.body).to.have.property('payload');
+            expect(res.body.payload).to.have.property('email');
+          })
+          .end(done);
+      });
+    });
+  });
 });

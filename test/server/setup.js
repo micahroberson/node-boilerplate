@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import express from 'express';
 import request from 'supertest';
 import chai from 'chai';
@@ -24,7 +25,13 @@ before((done) => {
           let modelClass = require(`../../src/common/models/${toTitleCase(model)}`).default;
           let recursivelyCreateEntities = (entities, cb) => {
             if(!(entities && entities.length)) {return cb();}
-            let entity = new modelClass(entities[0]);
+            let data = entities[0];
+            _.each(data, (val, key) => {
+              if(val === 'CURRENT_TIMESTAMP') {
+                data[key] = new Date();
+              }
+            });
+            let entity = new modelClass(data);
             ctx[`${model}sRepository`]
               .create(entity)
               .then(() => {

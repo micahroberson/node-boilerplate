@@ -8,8 +8,8 @@ import ParametersInvalidError from '../lib/errors/ParametersInvalidError';
 
 class UsersRepository extends BaseRepository {
   find(values={}) {
-    let conditions = _.map((str, val, key) => {
-      return str += `${key} = $${key}`;
+    let conditions = _.map(values, (val, key) => {
+      return `${key} = $${key}`;
     });
     let conditionsStr = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ``;
     return this.db.query(`SELECT * FROM users ${conditionsStr}`, values)
@@ -52,7 +52,9 @@ class UsersRepository extends BaseRepository {
     if(user.password.length < 8) {return Promise.reject(new ParametersInvalidError({message: 'Password is too short. Minimum 8 characters is required.'}));}
     return this._setEncryptedPassword(user)
       .then((user) => {
-        return this.db.query(`INSERT INTO users (email, name, encrypted_password) VALUES ($email, $name, $encrypted_password) RETURNING *`, this._serializeUserForSQL(user))
+        let params = this._serializeUserForSQL(user);
+        let fields = _.keys(params);
+        return this.db.query(`INSERT INTO users (${fields.join(', ')}) VALUES (${fields.map(f => `$${f}`).join(', ')}) RETURNING *`, params)
           .then((records) => {
             return new User(records[0]);
           })
@@ -186,7 +188,13 @@ class UsersRepository extends BaseRepository {
     return {
       email: user.email.toLowerCase().trim(),
       name: user.name,
-      encrypted_password: user.encrypted_password
+      encrypted_password: user.encrypted_password,
+      email_verification_token: user.email_verification_token,
+      email_verified_at: user.email_verified_at,
+      email_verification_token_sent_at: user.email_verification_token_sent_at,
+      password_reset_token: user.password_reset_token,
+      password_reset_token_redeemed_at: user.password_reset_token_redeemed_at,
+      password_reset_token_sent_at: user.password_reset_token_sent_at
     };
   }
 }

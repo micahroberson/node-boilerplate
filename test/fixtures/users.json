@@ -2,6 +2,20 @@
   {
     "name": "Test User",
     "email": "test@example.com",
-    "password": "password"
+    "password": "password",
+    "email_verification_token": "EoFj5i7EjMEYiGkYAipl9lE_aP6lLdTeBW8oYVLZSvo",
+    "email_verification_token_sent_at": "2016-09-01T22:58:49.414Z",
+    "password_reset_token": "C_egX_APu7DnUrkZkH4VilvSy8U9uLXbt6wdtR_dzlo",
+    "password_reset_token_sent_at": "CURRENT_TIMESTAMP"
+  },
+  {
+    "name": "Test User 2",
+    "email": "testuser2@example.com",
+    "password": "password",
+    "email_verification_token": "222j5i7EjMEYiGkYAipl9lE_aP6lLdTeBW8oYVLZSvo",
+    "email_verification_token_sent_at": "2016-09-01T22:58:49.414Z",
+    "password_reset_token": "222gX_APu7DnUrkZkH4VilvSy8U9uLXbt6wdtR_dzlo",
+    "password_reset_token_sent_at": "2016-09-01T22:58:49.414Z",
+    "password_reset_token_redeemed_at": "2016-09-06T22:58:49.414Z"
   }
 ]

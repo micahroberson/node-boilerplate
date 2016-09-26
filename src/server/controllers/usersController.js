@@ -63,7 +63,7 @@ const usersController = {
   sendResetPasswordEmail: (ctx, payload) => {
     return ctx.usersRepository.findbyEmail(payload.email)
       .then((user) => {
-        if(!user) {return Promise.reject(new ParametersInvalidError(`We don't have any accounts linked to '${payload.email}'`));}
+        if(!user) {return Promise.reject(new ParametersInvalidError({message: `We don't have any accounts linked to '${payload.email}'`}));}
         return ctx.providerClients.bullQueueProviderClient
           .enqueue('SendPasswordResetEmail', {user_id: user.id})
           .then(() => {
@@ -74,12 +74,14 @@ const usersController = {
 
   resetPassword: (ctx, payload) => {
     return ctx.usersRepository.find({password_reset_token: payload.password_reset_token})
-      .then((user) => {
-        if(!user) {
-          return Promise.reject(new ParametersInvalidError('The token you provided is invalid.'));
+      .then((users) => {
+        if(!(users && users.length)) {
+          return Promise.reject(new ParametersInvalidError({message: 'The token you provided is invalid.'}));
         }
+        let user = users[0];
         if((new Date()) - user.password_reset_token_sent_at > ONE_DAY) {
-          return Promise.reject(new ParametersInvalidError('The token you provided has expired.'));
+          console.log('SENT AT: ', user.password_reset_token_sent_at);
+          return Promise.reject(new ParametersInvalidError({message: 'The token you provided has expired.'}));
         }
         return ctx.usersRepository.update(user, {password: payload.password})
           .then((user) => {
@@ -90,11 +92,11 @@ const usersController = {
 
   verifyEmail: (ctx, payload) => {
     return ctx.usersRepository.find({email_verification_token: payload.email_verification_token})
-      .then((user) => {
-        if(!user) {
-          return Promise.reject(new ParametersInvalidError('The token you provided is invalid.'));
+      .then((users) => {
+        if(!(users && users.length)) {
+          return Promise.reject(new ParametersInvalidError({message: 'The token you provided is invalid.'}));
         }
-        return ctx.usersRepository.update(user, {email_verified_at: new Date()})
+        return ctx.usersRepository.update(users[0], {email_verified_at: new Date()})
           .then((user) => {
             return {email: user.email};
           });
