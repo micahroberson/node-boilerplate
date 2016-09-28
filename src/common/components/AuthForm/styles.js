@@ -2,11 +2,11 @@ import {StyleSheet} from 'aphrodite/no-important';
 import colors from '../../lib/colors';
 
 const styles = StyleSheet.create({
-  signIn: {
+  authForm: {
     maxWidth: 360,
     margin: '80px auto'
   },
-  signInHeader: {
+  authFormHeader: {
     fontSize: 22,
     fontWeight: 500,
     lineHeight: '30px',

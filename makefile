@@ -21,9 +21,14 @@ logs-development:
 test-setup:
 	@BABEL_ENV=server NODE_ENV=test ./node_modules/.bin/db-migrate reset
 	@BABEL_ENV=server NODE_ENV=test ./node_modules/.bin/db-migrate up
+test-e2e:
+	@BABEL_ENV=server NODE_ENV=test ./node_modules/.bin/mocha --compilers js:babel-register --timeout 20000 --recursive test
+test-unit:
+	@NODE_ENV=test BABEL_ENV=client ./node_modules/.bin/jest
 test:
 	make test-setup
-	@BABEL_ENV=server NODE_ENV=test ./node_modules/.bin/mocha --compilers js:babel-register --timeout 20000 --recursive test
+	make test-e2e
+	make test-unit
 test-with-junit-reporter:
 	make test-setup
 	@BABEL_ENV=server NODE_ENV=test ./node_modules/.bin/mocha --compilers js:babel-register --timeout 20000 --recursive --reporter mocha-junit-reporter test

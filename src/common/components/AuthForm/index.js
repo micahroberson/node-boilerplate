@@ -55,7 +55,7 @@ class AuthForm extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if(this.props.mode !== nextProps.mode) {
-      this.setState({mdoe: nextProps.mode});
+      this.setState({mode: nextProps.mode});
     }
     if(this.props.mode === Modes.ForgotPassword &&
       this.props.requestState === RequestStates.Started &&
@@ -69,8 +69,8 @@ class AuthForm extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if(this.state.loading && (nextProps.requestState !== RequestStates.Started)) {
-      this.setState({loading: false});
+    if(this.props.requestState !== nextProps.requestState) {
+      this.setState({loading: nextProps.requestState === RequestStates.Started});
     }
   }
 
@@ -156,6 +156,7 @@ class AuthForm extends React.Component {
     let headerText, subheaderText, buttonText, altModeLinks, fieldsets;
     let nameInputProps = {
       className: css(styles.input),
+      id: 'name',
       type: 'name',
       placeholder: 'Enter your full name',
       value: name,
@@ -163,12 +164,13 @@ class AuthForm extends React.Component {
     };
     let nameFieldset = (
       <fieldset key="nameFieldset">
-        <label>Name</label>
+        <label htmlFor="name">Name</label>
         <input {...nameInputProps} />
       </fieldset>
     );
     let emailInputProps = {
       className: css(styles.input),
+      id: 'email',
       type: 'email',
       placeholder: 'Enter your email address',
       value: email,
@@ -176,12 +178,13 @@ class AuthForm extends React.Component {
     };
     let emailFieldset = (
       <fieldset key="emailFieldset">
-        <label>Email</label>
+        <label htmlFor="email">Email</label>
         <input {...emailInputProps} />
       </fieldset>
     );
     let passwordInputProps = {
       className: css(styles.input),
+      id: 'password',
       type: 'password',
       placeholder: 'Enter a password',
       value: password,
@@ -189,7 +192,7 @@ class AuthForm extends React.Component {
     };
     let passwordFieldset = (
       <fieldset key="passwordFieldset">
-        <label>Password</label>
+        <label htmlFor="password">Password</label>
         <input {...passwordInputProps} />
       </fieldset>
     );
@@ -251,8 +254,8 @@ class AuthForm extends React.Component {
         break;
     }
     return (
-      <div className={css(styles.signIn)}>
-        <h1 className={css(styles.signInHeader)}>{headerText}</h1>
+      <div className={css(styles.authForm)}>
+        <h1 className={css(styles.authFormHeader)}>{headerText}</h1>
         {subheaderText ? <p className={css(styles.subheader)}>{subheaderText}</p> : null}
         {this.renderError()}
         <form onSubmit={this.handleOnSubmitForm.bind(this)}>
@@ -266,6 +269,8 @@ class AuthForm extends React.Component {
     );
   }
 }
+
+export let undecorated = AuthForm;
 
 AuthForm = connectToStores(AuthForm, [UserStore], (context, props) => {
   let {state, error} = context.getStore(UserStore).getEventData(ModeEventMap[props.mode]);
