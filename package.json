@@ -75,7 +75,6 @@
     "enzyme": "^2.4.1",
     "jest-cli": "^15.1.1",
     "mocha": "^3.0.2",
-    "mocha-junit-reporter": "^1.12.0",
     "nodemon": "^1.10.2",
     "react-addons-test-utils": "^15.3.2",
     "sinon": "^1.17.6",

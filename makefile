@@ -29,9 +29,6 @@ test:
 	make test-setup
 	make test-e2e
 	make test-unit
-test-with-junit-reporter:
-	make test-setup
-	@BABEL_ENV=server NODE_ENV=test ./node_modules/.bin/mocha --compilers js:babel-register --timeout 20000 --recursive --reporter mocha-junit-reporter test
 
 migrate:
 	@BABEL_ENV=server NODE_ENV=development ./node_modules/.bin/db-migrate $(RUN_ARGS)
