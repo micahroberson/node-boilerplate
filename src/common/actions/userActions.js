@@ -78,7 +78,7 @@ const userActions = {
         return user;
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
         context.dispatch('USER_ME_FAILURE', {error});
         return null;
       });
@@ -95,7 +95,7 @@ const userActions = {
         return user;
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
         context.dispatch('USER_UPDATE_FAILURE', {error});
         return null;
       });
@@ -116,7 +116,7 @@ const userActions = {
         return {};
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
         context.dispatch('USER_SEND_PASSWORD_RESET_EMAIL_FAILURE', {error});
         return null;
       });
@@ -142,7 +142,7 @@ const userActions = {
         return {};
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
         context.dispatch('USER_RESET_PASSWORD_FAILURE', {error});
         return null;
       });

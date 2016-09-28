@@ -13,12 +13,16 @@ const styles = StyleSheet.create({
     margin: '0 0 20px',
     textAlign: 'center'
   },
+  subheader: {
+    fontSize: 16,
+    textAlign: 'center'
+  },
   input: {
     width: '100%',
     borderBottom: `1px solid ${colors.black35}`
   },
   submitButton: {
-
+    minWidth: 240
   },
   buttonWrapper: {
     textAlign: 'center',

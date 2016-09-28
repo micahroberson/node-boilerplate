@@ -119,8 +119,9 @@ const BaseCSS = `
     background-color: #ffffff;
     border: 0;
     color: #1c1c1c;
-    padding: 8px 12px;
+    padding: 0 12px;
     font-size: 14px;
+    line-height: 35px;
     font-weight: 500;
   }
   button.jellyBean {
@@ -158,10 +159,34 @@ const BaseCSS = `
   ol, ul {
     list-style: none;
   }
-  .cf::after {
-    clear: both;
-    content: "";
-    display: table;
+  .loadingSpinner {
+    border: 2px rgba(255,255,255,0) solid;
+    border-top: 2px #ffffff solid;
+    border-right: 2px #ffffff solid;
+    border-radius: 50%;
+    -webkit-animation: loadingSpinner .6s infinite linear;
+    animation: loadingSpinner .6s infinite linear;
+    width: 15px;
+    height: 15px;
+    display: block;
+    margin: 10px auto;
+  }
+
+  @-webkit-keyframes loadingSpinner {
+    from {
+      -webkit-transform: rotate(0deg);
+    }
+    to {
+      -webkit-transform: rotate(359deg);
+    }
+  }
+  @keyframes loadingSpinner {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(359deg);
+    }
   }
 `.replace(/(\r\n|\n|\r)/gm,'');
 

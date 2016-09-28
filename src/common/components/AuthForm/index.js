@@ -54,6 +54,9 @@ class AuthForm extends React.Component {
   shouldComponentUpdate = shouldComponentUpdatePure;
 
   componentWillReceiveProps(nextProps) {
+    if(this.props.requestState !== nextProps.requestState) {
+      this.setState({loading: nextProps.requestState === RequestStates.Started});
+    }
     if(this.props.mode !== nextProps.mode) {
       this.setState({mode: nextProps.mode});
     }
@@ -65,12 +68,6 @@ class AuthForm extends React.Component {
       this.props.requestState === RequestStates.Started &&
       nextProps.requestState === RequestStates.Success) {
       this.setState({mode: Modes.PasswordUpdated});
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if(this.props.requestState !== nextProps.requestState) {
-      this.setState({loading: nextProps.requestState === RequestStates.Started});
     }
   }
 
@@ -153,7 +150,7 @@ class AuthForm extends React.Component {
 
   render() {
     let {name, email, password, loading, mode} = this.state;
-    let headerText, subheaderText, buttonText, altModeLinks, fieldsets;
+    let headerText, subheaderText, buttonContents, altModeLinks, fieldsets;
     let nameInputProps = {
       className: css(styles.input),
       id: 'name',
@@ -217,7 +214,7 @@ class AuthForm extends React.Component {
 
     switch(mode) {
       case Modes.SignIn:
-        buttonText = headerText = 'Sign in';
+        buttonContents = headerText = 'Sign in';
         fieldsets = [emailFieldset, passwordFieldset];
         altModeLinks = [
           <p key="signUpLink" className={css(styles.altLinkWrapper)}>Not registered? <Link {...signUpLinkProps}>Sign up</Link></p>,
@@ -225,7 +222,7 @@ class AuthForm extends React.Component {
         ];
         break;
       case Modes.SignUp:
-        buttonText = headerText = 'Sign up';
+        buttonContents = headerText = 'Sign up';
         fieldsets = [nameFieldset, emailFieldset, passwordFieldset];
         altModeLinks = [
           <p key="signInLink" className={css(styles.altLinkWrapper)}>Already have an account? <Link {...signInLinkProps}>Sign in</Link></p>,
@@ -233,7 +230,7 @@ class AuthForm extends React.Component {
         ];
         break;
       case Modes.ForgotPassword:
-        buttonText = headerText = 'Send reset password instructions';
+        buttonContents = headerText = 'Send reset password instructions';
         fieldsets = [emailFieldset];
         altModeLinks = [
           <p key="signInLink" className={css(styles.altLinkWrapper)}>Already have an account? <Link {...signInLinkProps}>Sign in</Link></p>,
@@ -241,7 +238,7 @@ class AuthForm extends React.Component {
         ];
         break;
       case Modes.ResetPassword:
-        buttonText = headerText = 'Reset my password';
+        buttonContents = headerText = 'Reset my password';
         fieldsets = [passwordFieldset];
         break;
       case Modes.ResetPasswordLinkSent:
@@ -253,6 +250,11 @@ class AuthForm extends React.Component {
         subheaderText = `You're password has been updated successfullly. You may now login with your email and new password.`;
         break;
     }
+
+    if(loading) {
+      buttonContents = <span className="loadingSpinner" />;
+    }
+
     return (
       <div className={css(styles.authForm)}>
         <h1 className={css(styles.authFormHeader)}>{headerText}</h1>
@@ -261,7 +263,7 @@ class AuthForm extends React.Component {
         <form onSubmit={this.handleOnSubmitForm.bind(this)}>
           {fieldsets}
           <div className={css(styles.buttonWrapper)}>
-            {buttonText ? <button {...submitButtonProps}>{buttonText}</button> : null}
+            {buttonContents ? <button {...submitButtonProps}>{buttonContents}</button> : null}
           </div>
           {altModeLinks}
         </form>

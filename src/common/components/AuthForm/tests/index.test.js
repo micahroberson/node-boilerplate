@@ -154,40 +154,86 @@ describe('<AuthForm />', () => {
       });
     });
 
-    describe('when props.requestState changes to RequestStates.Started', () => {
-      it('disables the submit button', () => {
-        wrapper.setProps({requestState: RequestStates.Started});
-        expect(wrapper.find('button').first().props().disabled).toBe(true);
-      });
-    });
-
-    describe('when props.requestState changes to RequestStates.Success', () => {
-      it('disables the submit button', () => {
-        wrapper.setProps({requestState: RequestStates.Started});
-        wrapper.setProps({requestState: RequestStates.Success});
-        expect(wrapper.find('button').first().props().disabled).toBe(false);
-      });
-    });
-
-    describe('when props.requestState changes to RequestStates.Failure', () => {
+    describe('when the mode is PasswordUpdated', () => {
       beforeAll(() => {
-        wrapper = mount(<AuthForm mode={Modes.SignIn} />, {context});
-        wrapper.setProps({requestState: RequestStates.Started});
-        wrapper.setProps({
-          requestState: RequestStates.Failure,
-          error: {message: 'Error message'}
+        wrapper = mount(<AuthForm mode={Modes.PasswordUpdated} />, {context});
+        instance = wrapper.instance();
+      });
+
+      it('renders none of the inputs', () => {
+        expect(wrapper.find('#email').length).toBe(0);
+        expect(wrapper.find('#password').length).toBe(0);
+        expect(wrapper.find('#name').length).toBe(0);
+      });
+
+      it('renders the correct header', () => {
+        expect(wrapper.find(`.${css(styles.authFormHeader)}`).length).toBe(1);
+        expect(wrapper.find(`.${css(styles.authFormHeader)}`).text()).toContain('Reset my password');
+        expect(wrapper.find(`.${css(styles.subheader)}`).length).toBe(1);
+        expect(wrapper.find(`.${css(styles.subheader)}`).text()).toMatch(/password has been updated successfullly/);
+      });
+    });
+
+    describe('when the mode is ResetPasswordLinkSent', () => {
+      beforeAll(() => {
+        wrapper = mount(<AuthForm mode={Modes.ResetPasswordLinkSent} />, {context});
+        instance = wrapper.instance();
+      });
+
+      it('renders none of the inputs/button', () => {
+        expect(wrapper.find('#email').length).toBe(0);
+        expect(wrapper.find('#password').length).toBe(0);
+        expect(wrapper.find('#name').length).toBe(0);
+        expect(wrapper.find('button').length).toBe(0);
+      });
+
+      it('renders the correct header', () => {
+        expect(wrapper.find(`.${css(styles.authFormHeader)}`).length).toBe(1);
+        expect(wrapper.find(`.${css(styles.authFormHeader)}`).text()).toContain('Send reset password instructions');
+        expect(wrapper.find(`.${css(styles.subheader)}`).length).toBe(1);
+        expect(wrapper.find(`.${css(styles.subheader)}`).text()).toMatch(/emailed instructions/);
+      });
+    });
+
+    describe('prop changes', () => {
+      beforeAll(() => {
+        wrapper = mount(<AuthForm mode={Modes.SignUp} />, {context});
+      });
+
+      describe('when props.requestState changes to RequestStates.Started', () => {
+        it('disables the submit button', () => {
+          wrapper.setProps({requestState: RequestStates.Started});
+          expect(wrapper.find('button').first().props().disabled).toBe(true);
         });
       });
 
-      it('disables the submit button', () => {
-        expect(wrapper.find('button').first().props().disabled).toBe(false);
+      describe('when props.requestState changes to RequestStates.Success', () => {
+        it('disables the submit button', () => {
+          wrapper.setProps({requestState: RequestStates.Started});
+          wrapper.setProps({requestState: RequestStates.Success});
+          expect(wrapper.find('button').first().props().disabled).toBe(false);
+        });
       });
 
-      it('displays the error', () => {
-        let elems = wrapper.find(`.${css(styles.error)}`);
-        expect(elems.length).toBe(1);
-        expect(elems.text()).toContain('Error message');
-      })
+      describe('when props.requestState changes to RequestStates.Failure', () => {
+        beforeAll(() => {
+          wrapper.setProps({requestState: RequestStates.Started});
+          wrapper.setProps({
+            requestState: RequestStates.Failure,
+            error: {message: 'Error message'}
+          });
+        });
+
+        it('disables the submit button', () => {
+          expect(wrapper.find('button').first().props().disabled).toBe(false);
+        });
+
+        it('displays the error', () => {
+          let elems = wrapper.find(`.${css(styles.error)}`);
+          expect(elems.length).toBe(1);
+          expect(elems.text()).toContain('Error message');
+        });
+      });
     });
   });
 });

@@ -8,7 +8,7 @@ class ResetPassword extends React.Component {
   render() {
     let authFormProps = {
       mode: Modes.ResetPassword,
-      passwordResetToken: this.props.token
+      passwordResetToken: this.props.routeParams.token
     };
     return <AuthForm {...authFormProps} />;
   }
