@@ -1,4 +1,5 @@
 import Promise from 'bluebird';
+import ObjectID from 'bson-objectid';
 import BaseProvider, {BaseProviderClient} from './BaseProvider';
 import BullQueue from 'bull';
 
@@ -14,9 +15,16 @@ class BullQueueProvider extends BaseProvider {
           console.log('BullQueue error: ', error);
           reject(error);
         })
-        .on('failed', (error) => {
-          console.log('BullQueue Job failed: ', error);
-        });;
+        .on('completed', (job, jobPromise) => {
+          console.log(`${job.data.job_class} (${job.opts.jobId}) started`);
+        })
+        .on('failed', (job, error) => {
+          console.log(`${job.data.job_class} (${job.opts.jobId}) failed with payload: `, job.data.payload);
+          console.log(error);
+        })
+        .on('completed', (job) => {
+          console.log(`${job.data.job_class} (${job.opts.jobId}) completed successfullly`);
+        });
     });
   }
 
@@ -46,7 +54,12 @@ class BullQueueProviderClient extends BaseProviderClient {
   }
 
   enqueue(jobClass, payload) {
-    return this.client.add({payload, job_class: jobClass});
+    return this.client.add({
+      payload,
+      job_class: jobClass
+    }, {
+      jobId: (new ObjectID()).toHexString()
+    });
   //   return new Promise((resolve, reject) => {
   //     queue
   //       .add({payload, job_class: jobClass})
