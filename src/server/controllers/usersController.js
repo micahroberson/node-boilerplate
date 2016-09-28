@@ -63,7 +63,7 @@ const usersController = {
   sendResetPasswordEmail: (ctx, payload) => {
     return ctx.usersRepository.findbyEmail(payload.email)
       .then((user) => {
-        if(!user) {return Promise.reject(new ParametersInvalidError({message: `We don't have any accounts linked to '${payload.email}'`}));}
+        if(!user) {return Promise.resolve({});}
         return ctx.providerClients.bullQueueProviderClient
           .enqueue('SendPasswordResetEmail', {user_id: user.id})
           .then(() => {
@@ -79,11 +79,16 @@ const usersController = {
           return Promise.reject(new ParametersInvalidError({message: 'The token you provided is invalid.'}));
         }
         let user = users[0];
+        if(user.password_reset_token_redeemed_at) {
+          return Promise.reject(new ParametersInvalidError({message: 'The token you provided has already been used. Please request a new one.'}));
+        }
         if((new Date()) - user.password_reset_token_sent_at > ONE_DAY) {
-          console.log('SENT AT: ', user.password_reset_token_sent_at);
           return Promise.reject(new ParametersInvalidError({message: 'The token you provided has expired.'}));
         }
-        return ctx.usersRepository.update(user, {password: payload.password})
+        return ctx.usersRepository.update(user, {
+          password: payload.password,
+          password_reset_token_redeemed_at: new Date()
+          })
           .then((user) => {
             return {};
           });
