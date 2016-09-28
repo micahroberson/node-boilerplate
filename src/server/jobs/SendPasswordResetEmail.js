@@ -5,10 +5,8 @@ class SendPasswordResetEmail extends BaseJob {
     return this.ctx.usersRepository.findById(payload.user_id, true)
       .bind(this)
       .then(this.updatePasswordResetToken)
-      .bind(this.ctx.usersRepository)
-      .then(this.ctx.usersRepository.sendResetPasswordEmail)
-      .bind(this)
-      .bind(this.updateResetPasswordTokenSentAt);
+      .then(this.sendResetPasswordEmail)
+      .then(this.updateResetPasswordTokenSentAt);
   }
 
   updatePasswordResetToken(user) {
@@ -23,6 +21,13 @@ class SendPasswordResetEmail extends BaseJob {
     return this.ctx.usersRepository.update(user, {
       password_reset_token_sent_at: new Date()
     });
+  }
+
+  sendResetPasswordEmail(user) {
+    return this.ctx.usersRepository.sendResetPasswordEmail(user)
+      .then((result) => {
+        return user;
+      });
   }
 }
 
