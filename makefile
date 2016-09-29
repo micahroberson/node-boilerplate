@@ -5,6 +5,14 @@ ifeq (migrate,$(firstword $(MAKECMDGOALS)))
   $(eval $(RUN_ARGS):;@:)
 endif
 
+db-setup:
+	createdb node_boilerplate
+	createdb node_boilerplate_test
+	psql -c "CREATE USER node_boilerplate WITH PASSWORD 'password'"
+	psql -c "CREATE USER node_boilerplate_test WITH PASSWORD 'password'"
+	psql -c "GRANT ALL PRIVILEGES ON DATABASE node_boilerplate TO node_boilerplate"
+	psql -c "GRANT ALL PRIVILEGES ON DATABASE node_boilerplate_test TO node_boilerplate_test"
+
 install:
 	@echo "Installing dependencies"
 	@npm install
