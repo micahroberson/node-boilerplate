@@ -1,26 +1,9 @@
-import express from 'express';
-import toureiro from 'toureiro';
-import appRouter from './routers/app';
-import ApiRouter from './routers/api';
-import Environment from './config/Environment';
-import providers from './providers';
+import path from 'path';
+let rootDir = path.resolve(__dirname, '../..');
 
-let environment = new Environment();
-environment.load(providers)
-  .then(() => {
-    const server = express();
-
-    server.disable('x-powered-by');
-
-    let apiRouter = new ApiRouter(environment);
-    server.use('/api', apiRouter.routes);
-    server.use('/toureiro', toureiro());
-    server.use(appRouter);
-
-    server.listen(environment.config.PORT, () => {
-      console.log('listening on port: %s', environment.config.PORT);
-    });
-  })
-  .catch((error) => {
-    throw error;
+let WebpackIsomorphicTools = require('webpack-isomorphic-tools');
+global.webpackIsomorphicTools = new WebpackIsomorphicTools(require('../../config/webpack/isomorphic'))
+  .development(process.env.NODE_ENV === 'development')
+  .server(rootDir, function() {
+    require('./server');
   });

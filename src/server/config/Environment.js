@@ -12,6 +12,7 @@ class Environment {
   constructor() {
     this.providers = {};
     this.config = config;
+    this.env = env;
   }
 
   load(providers) {

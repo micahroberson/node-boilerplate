@@ -1,6 +1,8 @@
 let path = require('path');
 let fs = require('fs');
 let webpack = require('webpack');
+let WebpackIsomorphicToolsPlugin = require('webpack-isomorphic-tools/plugin');
+let webpackIsomorphicToolsConfig = require('./isomorphic');
 
 var babelrc = fs.readFileSync('./.babelrc');
 var babelConfig;
@@ -13,8 +15,9 @@ try {
 
 // Inject HMR plugin for development
 babelConfig.env.client.presets.push('react-hmre');
-
 let babelLoaderQuery = JSON.stringify(babelConfig.env.client);
+
+let webpackIsomorphicToolsPlugin = new WebpackIsomorphicToolsPlugin(webpackIsomorphicToolsConfig).development();
 
 module.exports = {
   entry: {
@@ -29,11 +32,13 @@ module.exports = {
   },
   module: {
     loaders: [
-      { test: /\.js$/, exclude: /node_modules/, loader: 'babel?' + babelLoaderQuery }
+      { test: /\.js$/, exclude: /node_modules/, loader: 'babel?' + babelLoaderQuery },
+      { test: webpackIsomorphicToolsPlugin.regular_expression('images'), loader: 'url-loader?limit=10240' }
     ]
   },
   plugins: [
-    new webpack.NamedModulesPlugin()
+    new webpack.NamedModulesPlugin(),
+    webpackIsomorphicToolsPlugin
   ],
   progress: true,
   devtool: 'eval-source-map',

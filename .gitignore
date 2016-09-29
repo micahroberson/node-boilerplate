@@ -3,3 +3,4 @@ npm-debug.log
 newrelic_agent.log
 delectory.paw
 .env
+webpack-assets.json
