@@ -9,4 +9,4 @@ const app = new Fluxible({
   ]
 });
 
-export default app;
+export default app

@@ -1,14 +1,14 @@
-jest.unmock('../styles');
-jest.unmock('../index');
-jest.unmock('../../../lib/shouldComponentUpdatePure');
+jest.unmock('./styles');
+jest.unmock('./index');
+jest.unmock('../../lib/shouldComponentUpdatePure');
 
 import {mount} from 'enzyme';
 import React from 'react';
 import {spy} from 'sinon';
-import {RequestStates} from '../../../stores/UserStore';
-import userActions from '../../../actions/userActions';
-import {undecorated as AuthForm, Modes} from '../index';
-import styles from '../styles';
+import {RequestStates} from '../../stores/BaseStore';
+import userActions from '../../actions/userActions';
+import {undecorated as AuthForm, Modes} from './index';
+import styles from './styles';
 import {css, StyleSheetTestUtils} from 'aphrodite/no-important';
 StyleSheetTestUtils.suppressStyleInjection();
 

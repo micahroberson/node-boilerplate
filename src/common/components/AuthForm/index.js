@@ -4,7 +4,8 @@ import {Link} from 'react-router';
 import {css} from 'aphrodite/no-important';
 import connectToStores from 'fluxible-addons-react/connectToStores';
 import userActions from '../../actions/userActions';
-import UserStore, {RequestStates} from '../../stores/UserStore';
+import UserStore from '../../stores/UserStore';
+import {RequestStates} from '../../stores/BaseStore';
 import shouldComponentUpdatePure from '../../lib/shouldComponentUpdatePure';
 import styles from './styles';
 
