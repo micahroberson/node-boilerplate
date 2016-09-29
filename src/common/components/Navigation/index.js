@@ -5,6 +5,9 @@ import User from '../../models/User';
 import shouldComponentUpdatePure from '../../lib/shouldComponentUpdatePure';
 import UserMenuPopover from '../UserMenuPopover';
 import styles from './styles';
+import logo from '../../images/logo.png';
+import logo2x from '../../images/logo@2x.png';
+import logo3x from '../../images/logo@3x.png';
 
 class Navigation extends React.Component {
   static propTypes = {
@@ -29,7 +32,9 @@ class Navigation extends React.Component {
     return (
       <nav className={css(styles.navigation)}>
         <div className={css(styles.innerContainer)}>
-          <Link className={css(styles.homeLink)} to="/">Node Boilerplate</Link>
+          <Link className={css(styles.homeLink)} to="/">
+            <img className={css(styles.logo)} src={logo} srcSet={`${logo2x} 2x, ${logo3x} 3x`} alt="Node Boilerplate" />
+          </Link>
           <ul className={css(styles.links)}>
             {links}
           </ul>

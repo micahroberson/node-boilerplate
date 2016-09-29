@@ -3,7 +3,7 @@ import colors from '../../lib/colors';
 
 const styles = StyleSheet.create({
   navigation: {
-    padding: '15px 30px',
+    padding: '10px 30px',
     fontSize: '14px',
     borderBottom: '1px solid rgba(0,0,0,0.15)'
   },
@@ -13,15 +13,20 @@ const styles = StyleSheet.create({
   },
   homeLink: {
     display: 'inline-block',
-    width: 200,
     fontWeight: 700,
     fontSize: 18,
-    color: colors.jellyBean
+    color: colors.jellyBean,
+    verticalAlign: 'middle',
+    paddingTop: '3px'
+  },
+  logo: {
+    height: '27px'
   },
   links: {
     display: 'inline-block',
     width: 'calc(100% - 200px)',
-    textAlign: 'right'
+    textAlign: 'right',
+    verticalAlign: 'middle'
   },
   link: {
     display: 'inline-block'
