@@ -212,7 +212,7 @@ describe('/users', () => {
           .post('/api/users/send-password-reset-email')
           .send({
             payload: {
-              email: 'test1234@example.com'
+              email: ''
             }
           })
           .expect(200)
@@ -276,7 +276,7 @@ describe('/users', () => {
           .post('/api/users/reset-password')
           .send({
             payload: {
-              password_reset_token: '222gX_APu7DnUrkZkH4VilvSy8U9uLXbt6wdtR_dzlo',
+              password_reset_token: '333gX_APu7DnUrkZkH4VilvSy8U9uLXbt6wdtR_dzlo',
               password: 'password2'
             }
           })

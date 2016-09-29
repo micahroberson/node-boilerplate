@@ -61,6 +61,7 @@ const usersController = {
   },
 
   sendResetPasswordEmail: (ctx, payload) => {
+    if(!payload.email) {return Promise.reject(new ParametersInvalidError({message: 'email must be provided'}));}
     return ctx.usersRepository.findbyEmail(payload.email)
       .then((user) => {
         if(!user) {return Promise.resolve({});}
