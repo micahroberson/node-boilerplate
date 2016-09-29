@@ -3,8 +3,7 @@ import Promise from 'bluebird';
 import bcrypt from 'bcrypt';
 import User from '../../common/models/User';
 import UserSession from '../../common/models/UserSession';
-import ParametersInvalidError from '../lib/errors/ParametersInvalidError';
-import UnauthorizedAccessError from '../lib/errors/UnauthorizedAccessError';
+import {ParametersInvalidError, UnauthorizedAccessError} from '../lib/errors/APIError';
 
 const InvalidEmailPasswordErrorValues = {message: 'The email/password combination you provided is invalid.'};
 const ONE_DAY = 60 * 60 * 24 * 1000;

@@ -9,3 +9,16 @@ class APIError extends Error {
 }
 
 export default APIError;
+
+export class ParametersInvalidError extends APIError {}
+
+export class NotFoundError extends APIError {}
+
+export class UnauthorizedAccessError extends APIError {
+  constructor(values={}) {
+    if(!values.message) {
+      values.message = 'Access denied.';
+    }
+    super(values);
+  }
+}

@@ -2,7 +2,7 @@ import Promise from 'bluebird';
 import crypto from 'crypto';
 import BaseRepository from './BaseRepository';
 import UserSession from '../../common/models/UserSession';
-import ParametersInvalidError from '../lib/errors/ParametersInvalidError';
+import {ParametersInvalidError} from '../lib/errors/APIError';
 
 class UserSessionsRepository extends BaseRepository {
   findbyId(id) {

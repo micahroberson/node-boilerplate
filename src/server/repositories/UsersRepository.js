@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import BaseRepository from './BaseRepository';
 import User from '../../common/models/User';
-import ParametersInvalidError from '../lib/errors/ParametersInvalidError';
+import {ParametersInvalidError} from '../lib/errors/APIError';
 
 class UsersRepository extends BaseRepository {
   find(values={}) {

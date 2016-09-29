@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import Router from 'express-promise-router';
-import UnauthorizedAccessError from '../../lib/errors/UnauthorizedAccessError';
+import {UnauthorizedAccessError} from '../../lib/errors/APIError';
 
 class BaseApiRouter {
   constructor(environment) {
