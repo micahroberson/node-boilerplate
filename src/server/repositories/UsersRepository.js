@@ -7,44 +7,11 @@ import User from '../../common/models/User';
 import {ParametersInvalidError} from '../lib/errors/APIError';
 
 class UsersRepository extends BaseRepository {
-  find(values={}) {
-    let conditions = _.map(values, (val, key) => {
-      return `${key} = $${key}`;
-    });
-    let conditionsStr = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ``;
-    return this.db.query(`SELECT * FROM users ${conditionsStr}`, values)
-      .then((records) => {
-        return records.map((r) => {return new User(r);});
-      });
-  }
+  static tableName = 'users';
+  static modelClass = User;
 
-  findById(id, errorOnNotFound=false) {
-    return this.db.query(`SELECT * FROM users WHERE id=$id`, {id})
-      .then((records) => {
-        if(!(records && records.length)) {
-          if(!errorOnNotFound) {return null;}
-          throw new ParametersInvalidError('Invalid user id');
-        }
-        let user = new User(records[0]);
-        return user;
-      });
-  }
-
-  findbyIds(ids) {
-    return this.db.query(`SELECT * FROM users WHERE id=ANY($ids)`, {ids})
-      .then((records) => {
-        return records.map((r) => {return new User(r);});
-      });
-  }
-
-  findbyEmail(email) {
-    email = email.toLowerCase().trim();
-    return this.db.query(`SELECT * FROM users WHERE email=$email`, {email})
-      .then((records) => {
-        if(!records.length) {return null;}
-        let user = new User(records[0]);
-        return user;
-      });
+  findByEmail(email, options={}) {
+    return this.find({email}, _.defaults({firstOnly: true}, options));
   }
 
   create(user) {
@@ -52,12 +19,7 @@ class UsersRepository extends BaseRepository {
     if(user.password.length < 8) {return Promise.reject(new ParametersInvalidError({message: 'Password is too short. Minimum 8 characters is required.'}));}
     return this._setEncryptedPassword(user)
       .then((user) => {
-        let params = this._serializeUserForSQL(user);
-        let fields = _.keys(params);
-        return this.db.query(`INSERT INTO users (${fields.join(', ')}) VALUES (${fields.map(f => `$${f}`).join(', ')}) RETURNING *`, params)
-          .then((records) => {
-            return new User(records[0]);
-          })
+        return super.create(user)
           .catch((error) => {
             if(error.code === '23505') {
               error = new ParametersInvalidError({message: 'The email address you entered is already in use'});
@@ -184,7 +146,7 @@ class UsersRepository extends BaseRepository {
     });
   }
 
-  _serializeUserForSQL(user) {
+  _serializeUserForSql(user) {
     return {
       email: user.email.toLowerCase().trim(),
       name: user.name,

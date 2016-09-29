@@ -28,7 +28,7 @@ const usersController = {
 
   signIn: (ctx, payload) => {
     if(!payload.email || !payload.password) {return Promise.reject(new ParametersInvalidError(InvalidEmailPasswordErrorValues));}
-    return ctx.usersRepository.findbyEmail(payload.email)
+    return ctx.usersRepository.findByEmail(payload.email)
       .then((user) => {
         if(!user) {throw new ParametersInvalidError(InvalidEmailPasswordErrorValues);}
         return new Promise((resolve, reject) => {
@@ -61,7 +61,7 @@ const usersController = {
 
   sendResetPasswordEmail: (ctx, payload) => {
     if(!payload.email) {return Promise.reject(new ParametersInvalidError({message: 'email must be provided'}));}
-    return ctx.usersRepository.findbyEmail(payload.email)
+    return ctx.usersRepository.findByEmail(payload.email)
       .then((user) => {
         if(!user) {return Promise.resolve({});}
         return ctx.providerClients.bullQueueProviderClient
