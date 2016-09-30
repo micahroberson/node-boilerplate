@@ -17,10 +17,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: colors.jellyBean,
     verticalAlign: 'middle',
-    paddingTop: '3px'
+    paddingTop: '4px'
   },
   logo: {
-    height: '27px'
+    height: '26px'
   },
   links: {
     display: 'inline-block',
