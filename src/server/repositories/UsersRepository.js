@@ -148,6 +148,7 @@ class UsersRepository extends BaseRepository {
 
   _serializeUserForSql(user) {
     return {
+      id: user.id,
       email: user.email.toLowerCase().trim(),
       name: user.name,
       encrypted_password: user.encrypted_password,

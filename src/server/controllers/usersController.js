@@ -11,40 +11,67 @@ const ONE_DAY = 60 * 60 * 24 * 1000;
 const usersController = {
   create: (ctx, payload) => {
     if(!payload.name || !payload.email || !payload.password) {return Promise.reject(new ParametersInvalidError({message: 'name, email and password are all required.'}));}
-    let user = new User(payload);
-    return ctx.usersRepository.create(user)
-      .then((user) => {
-        let session = new UserSession({user_id: user.id});
-        return ctx.userSessionsRepository.create(session)
-          .then((session) => {
-            return ctx.providerClients.bullQueueProviderClient.enqueue('SendWelcomeEmail', {user_id: user.id})
-              .then(() => {
-                console.log('finally');
-                return Object.assign({session_token: session.id}, serializeUser(user));
-              });
-          });
-      });
+    let commit = (session) => {
+      return ctx.providerClients.postgresProviderClient
+        .commit()
+        .return(session);
+    };
+    let rollback = (error) => {
+      return ctx.providerClients.postgresProviderClient
+        .rollback()
+        .return(error);
+    };
+    let createUser = (team) => {
+      let user = new User(payload);
+      return ctx.usersRepository.create(user);
+    };
+    let createSessionForUser = (user) => {
+      let session = new UserSession({user_id: user.id});
+      session.user = user;
+      return ctx.userSessionsRepository.create(session);
+    };
+    let enqueueSendWelcomeEmailJob = (session) => {
+      return ctx.providerClients.bullQueueProviderClient
+        .enqueue('SendWelcomeEmail', {user_id: session.user.id})
+        .return(session);
+    };
+    let serializeResponse = (session) => {
+      return Object.assign({session_token: session.id}, serializeUser(session.user));
+    };
+
+    return ctx.providerClients.postgresProviderClient
+      .transaction()
+      .then(createUser)
+      .then(createSessionForUser)
+      .then(commit)
+      .catch(rollback)
+      .then(enqueueSendWelcomeEmailJob)
+      .then(serializeResponse);
   },
 
   signIn: (ctx, payload) => {
     if(!payload.email || !payload.password) {return Promise.reject(new ParametersInvalidError(InvalidEmailPasswordErrorValues));}
-    return ctx.usersRepository.findByEmail(payload.email)
-      .then((user) => {
-        if(!user) {throw new ParametersInvalidError(InvalidEmailPasswordErrorValues);}
-        return new Promise((resolve, reject) => {
-          bcrypt.compare(payload.password, user.encrypted_password, (error, authenticated) => {
-            if(error || !authenticated) {return reject(new ParametersInvalidError(InvalidEmailPasswordErrorValues));}
-            let session = new UserSession({user_id: user.id});
-            ctx.userSessionsRepository.create(session)
-              .then((session) => {
-                return resolve(Object.assign({session_token: session.id}, serializeUser(user)));
-              })
-              .catch((error) => {
-                return reject(error);
-              });
-          });
+    let authenticate = (user) => {
+      if(!user) {throw new ParametersInvalidError(InvalidEmailPasswordErrorValues);}
+      return new Promise((resolve, reject) => {
+        bcrypt.compare(payload.password, user.encrypted_password, (error, authenticated) => {
+          if(error || !authenticated) {return reject(new ParametersInvalidError(InvalidEmailPasswordErrorValues));}
+          return resolve(user);
         });
       });
+    };
+    let createSessionForUser = (user) => {
+      let session = new UserSession({user_id: user.id});
+      session.user = user;
+      return ctx.userSessionsRepository.create(session);
+    };
+    let serializeResponse = (session) => {
+      return Object.assign({session_token: session.id}, serializeUser(session.user));
+    };
+    return ctx.usersRepository.findByEmail(payload.email)
+      .then(authenticate)
+      .then(createSessionForUser)
+      .then(serializeResponse);
   },
 
   update: (ctx, payload) => {

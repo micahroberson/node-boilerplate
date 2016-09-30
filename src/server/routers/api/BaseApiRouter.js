@@ -12,7 +12,7 @@ class BaseApiRouter {
     if(!req.headers.authorization) {return Promise.reject(new UnauthorizedAccessError({message: 'Authorization header is missing.'}));}
     let encodedUserSessionId = req.headers.authorization.split(' ')[1];
     let id = new Buffer(encodedUserSessionId, 'base64').toString('utf8');
-    return req.ctx.userSessionsRepository.findbyId(id)
+    return req.ctx.userSessionsRepository.findById(id)
       .then((userSession) => {
         if(!userSession) {throw new UnauthorizedAccessError();}
         if(userSession.expires_at && userSession.expires_at < new Date()) {throw new UnauthorizedAccessError({message: 'Your session has expired.'});}

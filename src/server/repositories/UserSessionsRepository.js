@@ -5,14 +5,8 @@ import UserSession from '../../common/models/UserSession';
 import {ParametersInvalidError} from '../lib/errors/APIError';
 
 class UserSessionsRepository extends BaseRepository {
-  findbyId(id) {
-    return this.db.query(`SELECT * FROM user_sessions WHERE id=$id`, {id})
-      .then((records) => {
-        if(!records.length) {return null;}
-        let userSession = new UserSession(records[0]);
-        return userSession;
-      });
-  }
+  static tableName = 'user_sessions';
+  static modelClass = UserSession;
 
   create(userSession) {
     // TODO: Validation
@@ -20,13 +14,10 @@ class UserSessionsRepository extends BaseRepository {
     if(!userSession.id) {
       userSession.id = crypto.randomBytes(32).toString('base64');
     }
-    return this.db.query(`INSERT INTO user_sessions (id, user_id, expires_at) VALUES ($id, $user_id, $expires_at) RETURNING *`, this._serializeUserSessionForSQL(userSession))
-      .then((records) => {
-        return new UserSession(records[0]);
-      });
+    return super.create(userSession);
   }
 
-  _serializeUserSessionForSQL(userSession) {
+  _serializeUserSessionForSql(userSession) {
     return {
       id: userSession.id,
       user_id: userSession.user_id,

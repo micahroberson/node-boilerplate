@@ -1,6 +1,15 @@
 import Base from './Base';
+import Team from './Team';
 
 class User extends Base {
+  static belongsTo() {
+    return {
+      team: {
+        class: Team
+      }
+    };
+  }
+
   constructor(values) {
     super(values);
 

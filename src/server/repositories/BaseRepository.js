@@ -57,13 +57,16 @@ class BaseRepository {
 
   create(model) {
     let params = this[`_serialize${this.constructor.modelClass.name}ForSql`](model);
+    if(params.hasOwnProperty('id') && !params.id) {
+      delete params.id;
+    }
     let columns = _.keys(params);
     return this.db.query(`
       INSERT INTO ${this.constructor.tableName} (${columns.join(', ')})
       VALUES (${columns.map(c => `$${c}`).join(', ')}) RETURNING *
     `, params)
       .then((records) => {
-        return new this.constructor.modelClass(records[0]);
+        return model.assignRelationReferences(new this.constructor.modelClass(records[0]));
       });
   }
 

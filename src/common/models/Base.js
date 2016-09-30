@@ -56,6 +56,20 @@ class Base {
       }
     }
   }
+
+  assignRelationReferences(copy) {
+    let relations = Object.assign(
+      {},
+      this.constructor.belongsTo(),
+      this.constructor.hasMany(),
+      this.constructor.hasOne()
+    );
+
+    for(let relationName in relations) {
+      copy[relationName] = this[relationName];
+    }
+    return copy;
+  }
 }
 
 export default Base;

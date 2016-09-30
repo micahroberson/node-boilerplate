@@ -55,6 +55,18 @@ class PostgresProviderClient extends BaseProviderClient {
       });
     });
   }
+
+  transaction() {
+    return this.query('BEGIN');
+  }
+
+  rollback() {
+    return this.query('ROLLBACK');
+  }
+
+  commit() {
+    return this.query('COMMIT');
+  }
 }
 
 export default PostgresProvider
