@@ -40,7 +40,5 @@ module.exports = {
     new webpack.NamedModulesPlugin(),
     webpackIsomorphicToolsPlugin
   ],
-  progress: true,
-  devtool: 'eval-source-map',
-  debug: true
+  devtool: 'eval-source-map'
 };
