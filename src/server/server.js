@@ -2,6 +2,7 @@ import express from 'express';
 import toureiro from 'toureiro';
 import AppRouter from './routers/app';
 import ApiRouter from './routers/api';
+import WebhooksRouter from './routers/webhooks';
 import Environment from './config/Environment';
 import providers from './providers';
 
@@ -14,8 +15,10 @@ environment.load(providers)
 
     let apiRouter = new ApiRouter(environment);
     let appRouter = new AppRouter(environment);
+    let webhooksRouter = new WebhooksRouter(environment);
 
     server.use('/api', apiRouter.routes);
+    server.use('/webhooks', webhooksRouter.routes);
     server.use('/toureiro', toureiro());
     server.use(appRouter.routes);
 
