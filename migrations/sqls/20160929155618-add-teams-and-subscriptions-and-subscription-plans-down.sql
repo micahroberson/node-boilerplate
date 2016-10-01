@@ -6,6 +6,12 @@ DROP VIEW subscription_plans;
 DROP TABLE all_subscription_plans;
 DROP TABLE logs.all_subscription_plans;
 
+DROP VIEW payment_methods;
+ALTER TABLE all_payment_methods DROP COLUMN team_id;
+
 DROP VIEW teams;
 DROP TABLE all_teams;
 DROP TABLE logs.all_teams;
+
+DROP TABLE all_payment_methods;
+DROP TABLE logs.all_payment_methods;

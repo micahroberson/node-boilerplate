@@ -1,4 +1,5 @@
 import Base from './Base';
+import PaymentMethod from './PaymentMethod';
 import Subscription from './Subscription';
 import User from './User';
 
@@ -10,14 +11,20 @@ class Team extends Base {
       },
       users: {
         class: User
+      },
+      payment_methods: {
+        class: PaymentMethod
       }
     };
   }
 
   static belongsTo() {
     return {
-      billing_user: {
+      primary_user: {
         class: User
+      },
+      primary_payment_method: {
+        class: PaymentMethod
       }
     };
   }
