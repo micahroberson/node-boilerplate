@@ -9,7 +9,7 @@ const InvalidEmailPasswordErrorValues = {message: 'The email/password combinatio
 const ONE_DAY = 60 * 60 * 24 * 1000;
 
 const usersController = {
-  create: (ctx, payload) => {
+  create(ctx, payload) {
     if(!payload.name || !payload.email || !payload.password) {return Promise.reject(new ParametersInvalidError({message: 'name, email and password are all required.'}));}
     let commit = (session) => {
       return ctx.providerClients.postgresProviderClient
@@ -36,7 +36,10 @@ const usersController = {
         .return(session);
     };
     let serializeResponse = (session) => {
-      return Object.assign({session_token: session.id}, serializeUser(session.user));
+      return {
+        session_token: session.id,
+        user: serializeUser(session.user)
+      };
     };
 
     return ctx.providerClients.postgresProviderClient
@@ -49,7 +52,7 @@ const usersController = {
       .then(serializeResponse);
   },
 
-  signIn: (ctx, payload) => {
+  signIn(ctx, payload) {
     if(!payload.email || !payload.password) {return Promise.reject(new ParametersInvalidError(InvalidEmailPasswordErrorValues));}
     let authenticate = (user) => {
       if(!user) {throw new ParametersInvalidError(InvalidEmailPasswordErrorValues);}
@@ -66,7 +69,10 @@ const usersController = {
       return ctx.userSessionsRepository.create(session);
     };
     let serializeResponse = (session) => {
-      return Object.assign({session_token: session.id}, serializeUser(session.user));
+      return {
+        session_token: session.id,
+        user: serializeUser(session.user)
+      };
     };
     return ctx.usersRepository.findByEmail(payload.email)
       .then(authenticate)
@@ -74,19 +80,19 @@ const usersController = {
       .then(serializeResponse);
   },
 
-  update: (ctx, payload) => {
+  update(ctx, payload) {
     if(ctx.session.user.id !== payload.id) {return Promise.reject(new UnauthorizedAccessError());}
     return ctx.usersRepository.update(ctx.session.user, payload)
       .then((user) => {
-        return serializeUser(user);
+        return {user: serializeUser(user)};
       });
   },
 
-  me: (ctx, payload) => {
-    return Promise.resolve(serializeUser(ctx.session.user));
+  me(ctx, payload) {
+    return Promise.resolve({user: serializeUser(ctx.session.user)});
   },
 
-  sendResetPasswordEmail: (ctx, payload) => {
+  sendResetPasswordEmail(ctx, payload) {
     if(!payload.email) {return Promise.reject(new ParametersInvalidError({message: 'email must be provided'}));}
     return ctx.usersRepository.findByEmail(payload.email)
       .then((user) => {
@@ -99,7 +105,7 @@ const usersController = {
       });
   },
 
-  resetPassword: (ctx, payload) => {
+  resetPassword(ctx, payload) {
     return ctx.usersRepository.find({password_reset_token: payload.password_reset_token})
       .then((users) => {
         if(!(users && users.length)) {
@@ -122,7 +128,7 @@ const usersController = {
       });
   },
 
-  verifyEmail: (ctx, payload) => {
+  verifyEmail(ctx, payload) {
     return ctx.usersRepository.find({email_verification_token: payload.email_verification_token})
       .then((users) => {
         if(!(users && users.length)) {
@@ -138,12 +144,10 @@ const usersController = {
 
 export default usersController;
 
-function serializeUser(user) {
+export function serializeUser(user) {
   return {
-    user: {
-      id: user.id,
-      email: user.email,
-      name: user.name
-    }
+    id: user.id,
+    email: user.email,
+    name: user.name
   };
 }

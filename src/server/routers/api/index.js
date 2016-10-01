@@ -1,10 +1,40 @@
-import traverseFiles from '../../lib/traverseFiles';
-import BaseApiRouter from './BaseApiRouter';
+import Promise from 'bluebird';
+import Router from 'express-promise-router';
+import {UnauthorizedAccessError} from '../../lib/errors/APIError';
 import bodyParser from 'body-parser';
 import RequestContext from '../../lib/RequestContext';
+import usersController from '../../controllers/usersController';
 
-class ApiRouter extends BaseApiRouter {
+class ApiRouter {
   static path = '/api';
+
+  constructor(environment) {
+    this.routes = new Router();
+    this.setupRoutes(environment);
+  }
+
+  authorize(req, res) {
+    if(!req.headers.authorization) {return Promise.reject(new UnauthorizedAccessError({message: 'Authorization header is missing.'}));}
+    let encodedUserSessionId = req.headers.authorization.split(' ')[1];
+    let id = new Buffer(encodedUserSessionId, 'base64').toString('utf8');
+    return req.ctx.userSessionsRepository.findById(id)
+      .then((userSession) => {
+        if(!userSession) {throw new UnauthorizedAccessError();}
+        if(userSession.expires_at && userSession.expires_at < new Date()) {throw new UnauthorizedAccessError({message: 'Your session has expired.'});}
+        req.ctx.session = userSession;
+        return req.ctx.usersRepository.assignTo(userSession).return('next');
+      });
+  }
+
+  controllerActionHandler(action) {
+    return (req, res) => {
+      return action(req.ctx, Object.assign(req.params, req.payload))
+        .then((responsePayload) => {
+          res.payload = responsePayload;
+          return 'next';
+        });
+    }
+  }
 
   setupRoutes(environment) {
     this.routes.use(bodyParser.json());
@@ -23,20 +53,16 @@ class ApiRouter extends BaseApiRouter {
       });
     });
 
-    // Mount resource routers
-    traverseFiles(__dirname, (filename, filePath, stat) => {
-      if(filename !== 'index.js' && filename !== 'BaseApiRouter.js') {
-        let RouterClass = require(filePath).default;
-        let router = new RouterClass(environment);
-        this.routes.use(RouterClass.path, router.routes);
-      }
-    });
+    this.routes.post('/users/sign-in', this.controllerActionHandler(usersController.signIn));
+    this.routes.post('/users/create', this.controllerActionHandler(usersController.create));
+    this.routes.post('/users/me', this.authorize, this.controllerActionHandler(usersController.me));
+    this.routes.post('/users/update', this.authorize, this.controllerActionHandler(usersController.update));
+    this.routes.post('/users/send-password-reset-email', this.controllerActionHandler(usersController.sendResetPasswordEmail));
+    this.routes.post('/users/reset-password', this.controllerActionHandler(usersController.resetPassword));
+    this.routes.post('/users/verify-email', this.controllerActionHandler(usersController.verifyEmail));
 
     this.routes.use((req, res) => {
-      return req.ctx.close()
-        .then(() => {
-          return 'next';
-        });
+      return req.ctx.close().return('next');
     });
 
     // Response Middleware
