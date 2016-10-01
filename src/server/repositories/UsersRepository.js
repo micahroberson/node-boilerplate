@@ -55,29 +55,6 @@ class UsersRepository extends BaseRepository {
       });
   }
 
-  assignToObjects(objects) {
-    let wasArray = true;
-    if(!Array.isArray(objects)) {
-      objects = [objects];
-      wasArray = false;
-    }
-    let userIds = objects.map((obj) => {return obj.user_id;});
-    return this.findbyIds(userIds)
-      .then((users) => {
-        let usersByIdMap = users.reduce((map, user) => {
-          map[user.id] = user;
-          return map;
-        }, {});
-        objects.forEach((obj) => {
-          obj.user = usersByIdMap[obj.user_id];
-        });
-        if(!wasArray) {
-          return objects[0];
-        }
-        return objects;
-      });
-  }
-
   sendWelcomeEmail(user) {
     let options = {
       templateName: 'basic',
