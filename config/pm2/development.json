@@ -19,7 +19,8 @@
         "./src/server",
         "./src/common"
       ],
-      "node_args": "-r babel-register"
+      "node_args": "-r babel-register",
+      "merge_logs": true
     },
     {
       "autorestart": true,

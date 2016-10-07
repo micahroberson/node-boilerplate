@@ -17,14 +17,14 @@ install:
 	@echo "Installing dependencies"
 	@npm install
 
-run-development:
+start-development:
 	@node_modules/.bin/pm2 start ./config/pm2/development.json
 restart-development:
 	@node_modules/.bin/pm2 restart ./config/pm2/development.json
 stop-development:
 	@node_modules/.bin/pm2 delete ./config/pm2/development.json
 logs-development:
-	@node_modules/.bin/pm2 logs $(RUN_ARGS)
+	@node_modules/.bin/pm2 logs -l $(RUN_ARGS)
 
 test-setup:
 	@BABEL_ENV=server NODE_ENV=test ./node_modules/.bin/db-migrate reset
