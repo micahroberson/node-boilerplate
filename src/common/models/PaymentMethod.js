@@ -19,6 +19,8 @@ class PaymentMethod extends Base {
     this.expiration_year = values.expiration_year;
     this.stripe_card_id = values.stripe_card_id;
     this.stripe_card_object = values.stripe_card_object;
+
+    this.stripe_token_id = values.stripe_token_id; // Not persisted
   }
 }
 

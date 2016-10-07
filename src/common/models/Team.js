@@ -33,6 +33,7 @@ class Team extends Base {
     super(values);
 
     this.name = values.name;
+    this.stripe_customer_id = values.stripe_customer_id;
   }
 }
 
