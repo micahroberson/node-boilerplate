@@ -7,7 +7,7 @@ class SubscriptionsRepository extends BaseRepository {
   static tableName = 'subscriptions';
   static modelClass = Subscription;
 
-  _serializeSubscriptionPlanForSql(subscription) {
+  _serializeSubscriptionForSql(subscription) {
     return {
       id: subscription.id,
       team_id: subscription.team_id,
