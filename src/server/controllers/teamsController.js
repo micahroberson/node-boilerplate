@@ -1,40 +1,54 @@
 import _ from 'lodash';
 import Promise from 'bluebird';
+import PaymentMethod from '../../common/models/PaymentMethod';
 import Team from '../../common/models/Team';
 import {serializeUser} from './usersController';
-import {serializeSubscription} from './subscriptionsController';
 import {ParametersInvalidError, UnauthorizedAccessError} from '../lib/errors/APIError';
 
 const teamsController = {
   create(ctx, payload) {
-    
+    // NOTE: this creates a team for the current user
+    if(ctx.session.user.team_id) {
+      return Promise.reject(new ParametersInvalidError('User already belongs to a team'));
+    }
+    let createTeam = () => {
+      let team = new Team(payload);
+      team.primary_user_id = ctx.session.user.id;
+      team.primary_user = ctx.session.user;
+      return ctx.teamsRepository.create(team);
+    };
+    let createStripeCustomerForTeam = (team) => {
+      return ctx.teamsRepository.createStripeCustomer(team);
+    };
+    let setTeamIdOnUser = (team) => {
+      return ctx.usersRepository.update(ctx.session.user, {team_id: team.id})
+        .return(team);
+    }
+    return beginTransaction.call(ctx)
+      .then(createTeam)
+      .then(createStripeCustomerForTeam)
+      .then(setTeamIdOnUser)
+      .bind(ctx)
+      .then(commitTransaction)
+      .catch(rollbackTransaction)
+      .then(assignSerializationDependencies)
+      .then(serializeResponse);
   },
 
   team(ctx, payload) {
-    return ctx.teamsRepository.findById(payload.id)
+    // Returns the team for the current user
+    return ctx.teamsRepository.findById(ctx.session.user.team_id)
       .bind(ctx)
       .then(assignSerializationDependencies)
       .then(serializeResponse);
   },
 
   addPaymentMethod(ctx, payload) {
-    let beginTransaction = (team) => {
-      return ctx.providerClients.postgresProviderClient
-        .transaction()
-        .return(team);
-    };
-    let commit = (team) => {
-      return ctx.providerClients.postgresProviderClient
-        .commit()
-        .return(team);
-    };
-    let rollback = (error) => {
-      return ctx.providerClients.postgresProviderClient
-        .rollback()
-        .return(error);
-    };
+    if(!ctx.session.user.team_id) {
+      return Promise.reject(new ParametersInvalidError('User does not belong to a team'));
+    }
     let createPaymentMethod = (team) => {
-      let paymentMethod = new PaymentMethod(payload.payment_method);
+      let paymentMethod = new PaymentMethod({stripe_token_id: payload.stripe_token_id});
       paymentMethod.team_id = team.id;
       paymentMethod.team = team;
       return ctx.paymentMethodsRepository.create(paymentMethod);
@@ -49,12 +63,13 @@ const teamsController = {
       );
     };
 
-    return ctx.teamsRepository.findById(payload.id)
+    return ctx.teamsRepository.findById(ctx.session.user.team_id)
+      .bind(ctx)
       .then(beginTransaction)
       .then(createPaymentMethod)
       .then(setPrimaryPaymentMethod)
-      .then(commit)
-      .catch(rollback)
+      .then(commitTransaction)
+      .catch(rollbackTransaction)
       .then(assignSerializationDependencies)
       .then(serializeResponse);
   }
@@ -64,9 +79,36 @@ export default teamsController;
 
 // Note: should be called with 'ctx' context
 function assignSerializationDependencies(team) {
-  return this.paymentMethodsRepository.assignManyTo(team)
-    .then(this.subscriptionsRepository.assignManyTo)
-    .then(this.usersRepository.assignManyTo);
+  if(!team) {return null;}
+  let assignPaymentMethods = (team) => {
+    return this.paymentMethodsRepository.assignManyTo(team);
+  };
+  let assignSubscriptions = (team) => {
+    return this.subscriptionsRepository.assignManyTo(team);
+  };
+  let assignUsers = (team) => {
+    return this.usersRepository.assignManyTo(team);
+  };
+  return assignPaymentMethods(team)
+    .then(assignSubscriptions)
+    .then(assignUsers);
+}
+function beginTransaction(team) {
+  return this.providerClients.postgresProviderClient
+    .transaction()
+    .return(team);
+}
+function commitTransaction(team) {
+  return this.providerClients.postgresProviderClient
+    .commit()
+    .return(team);
+}
+function rollbackTransaction(error) {
+  return this.providerClients.postgresProviderClient
+    .rollback()
+    .then(() => {
+      throw error;
+    });
 }
 
 function serializeResponse(team) {
@@ -74,6 +116,7 @@ function serializeResponse(team) {
 }
 
 export function serializeTeam(team) {
+  if(!team) {return null;}
   let json = {
     id: team.id,
     name: team.name,
@@ -99,5 +142,14 @@ export function serializePaymentMethod(paymentMethod) {
     last_four: paymentMethod.last_four,
     expiration_month: paymentMethod.expiration_month,
     expiration_year: paymentMethod.expiration_year
+  };
+}
+
+export function serializeSubscription(subscription) {
+  return {
+    id: subscription.id,
+    status: subscription.status,
+    current_period_start: subscription.current_period_start,
+    current_period_end: subscription.current_period_end
   };
 }

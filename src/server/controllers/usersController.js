@@ -19,7 +19,9 @@ const usersController = {
     let rollback = (error) => {
       return ctx.providerClients.postgresProviderClient
         .rollback()
-        .return(error);
+        .then(() => {
+          throw error;
+        });
     };
     let createUser = (team) => {
       let user = new User(payload);
