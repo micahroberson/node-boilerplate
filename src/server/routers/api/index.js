@@ -4,10 +4,9 @@ import {UnauthorizedAccessError} from '../../lib/errors/APIError';
 import bodyParser from 'body-parser';
 import RequestContext from '../../lib/RequestContext';
 import usersController from '../../controllers/usersController';
+import teamsController from '../../controllers/teamsController';
 
 class ApiRouter {
-  static path = '/api';
-
   constructor(environment) {
     this.routes = new Router();
     this.setupRoutes(environment);
@@ -60,6 +59,10 @@ class ApiRouter {
     this.routes.post('/users/send-password-reset-email', this.controllerActionHandler(usersController.sendResetPasswordEmail));
     this.routes.post('/users/reset-password', this.controllerActionHandler(usersController.resetPassword));
     this.routes.post('/users/verify-email', this.controllerActionHandler(usersController.verifyEmail));
+
+    this.routes.post('/teams/create', this.authorize, this.controllerActionHandler(teamsController.create))
+    this.routes.post('/teams/team', this.authorize, this.controllerActionHandler(teamsController.team))
+    this.routes.post('/teams/add-payment-method', this.authorize, this.controllerActionHandler(teamsController.addPaymentMethod))
 
     this.routes.use((req, res) => {
       return req.ctx.close().return('next');

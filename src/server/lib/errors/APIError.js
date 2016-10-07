@@ -1,5 +1,8 @@
 class APIError extends Error {
   constructor(values={}) {
+    if(typeof values === 'string') {
+      values = {message: values};
+    }
     super(values.message);
     Error.captureStackTrace(this, this.constructor);
     this.name = this.constructor.name;
