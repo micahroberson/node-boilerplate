@@ -32,26 +32,7 @@ class UsersRepository extends BaseRepository {
   update(user, payload) {
     return this._setEncryptedPassword(payload)
       .then((payload) => {
-        let params = _.pick(payload, [
-          'name',
-          'email',
-          'email_verification_token',
-          'email_verification_token_sent_at',
-          'email_verified_at',
-          'password_reset_token',
-          'password_reset_token_sent_at',
-          'password_reset_token_redeemed_at',
-          'encrypted_password'
-        ]);
-
-        let strParams = this.stringifyParamsForUpdate(params);
-        return this.db.query(`UPDATE users SET ${strParams} WHERE id=$id RETURNING *`, {
-          id: user.id,
-          ...params
-          })
-          .then((records) => {
-            return new User(records[0]);
-          });
+        return super.update(user, payload);
       });
   }
 
@@ -117,6 +98,7 @@ class UsersRepository extends BaseRepository {
         bcrypt.hash(object.password, salt, (error, encryptedPassword) => {
           if(error) {return reject(error);}
           object.encrypted_password = encryptedPassword;
+          delete object.password;
           return resolve(object);
         });
       });

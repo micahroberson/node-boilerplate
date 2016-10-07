@@ -10,6 +10,7 @@ class BaseRepository {
     this.db = ctx.providerClients.postgresProviderClient;
     this.queue = ctx.providerClients.bullQueueProviderClient;
     this.mailer = ctx.providerClients.mailerProviderClient;
+    this.stripe = ctx.providerClients.stripeProviderClient;
   }
 
   instantiateModel(records) {
@@ -58,7 +59,12 @@ class BaseRepository {
   }
 
   findbyIds(ids) {
-    return this.db.query(`SELECT * FROM ${this.constructor.tableName} WHERE id=ANY($ids)`, {ids})
+    return this.db.query(`
+      SELECT *
+      FROM ${this.constructor.tableName}
+      WHERE id=ANY($ids)
+    `, {ids})
+      .bind(this)
       .then(this.instantiateModels);
   }
 
@@ -72,6 +78,26 @@ class BaseRepository {
       INSERT INTO ${this.constructor.tableName} (${columns.join(', ')})
       VALUES (${columns.map(c => `$${c}`).join(', ')}) RETURNING *
     `, params)
+      .then((records) => {
+        return model.assignRelationReferences(new this.constructor.modelClass(records[0]));
+      });
+  }
+
+  update(model, payload) {
+    let params = {};
+    for(let prop in payload) {
+      let value = payload[prop];
+      if(model.hasOwnProperty(prop)) {
+        params[prop] = value;
+      }
+    }
+    let strParams = this.stringifyParamsForUpdate(params);
+    return this.db.query(`
+      UPDATE ${this.constructor.tableName}
+      SET ${strParams}
+      WHERE id=$id
+      RETURNING *
+    `, {id: model.id, ...params})
       .then((records) => {
         return model.assignRelationReferences(new this.constructor.modelClass(records[0]));
       });
@@ -111,24 +137,54 @@ class BaseRepository {
       });
   }
 
-  assignManyTo(models) {
+  assignManyTo(models, options={}) {
     let wasArray = true;
     if(!Array.isArray(models)) {
       models = [models];
       wasArray = false;
     }
     // Check first object for relation to current repo's modelClass
-    let foreignKey, destinationProperty;
-    let hasManyRelations = this.constructor.modelClass.belongsTo();
-    for(let relationName in hasManyRelations) {
-      let relation = hasManyRelations[relationName];
-      if(relation.class === models[0].constructor) {
-        foreignKey = relation.foreign_key || `${relationName}_id`;
-        destinationProperty = relationName;
+    let relation, relationName;
+    let hasManyRelations = models[0].constructor.hasMany();
+    if(options.relationName) {
+      relationName = options.relationName;
+      relation = hasManyRelations[options.relationName];
+    } else {
+      // If relationName not provided assume first with same class
+      for(let rn in hasManyRelations) {
+        if(hasManyRelations[rn].class === this.constructor.modelClass) {
+          relationName = rn;
+          relation = hasManyRelations[rn]
+        }
       }
     }
+    // Check repo's modelClass for inverse relation to get foreign key
+    let belongsToRelations = this.constructor.modelClass.belongsTo();
+    let inverseRelation, inverseRelationName;
+    for(let rn in belongsToRelations) {
+      let r = belongsToRelations[rn];
+      if(relation.inverse_of) {
+        if(relation.inverse_of === rn) {
+          inverseRelationName = rn;
+          inverseRelation = r;
+          break;
+        }
+      } else if(models[0].constructor === r.class) {
+        inverseRelationName = rn;
+        inverseRelation = r;
+      }
+    }
+
+    let foreignKey = inverseRelation.foreign_key || `${inverseRelationName}_id`;
+    let destinationProperty = relationName;
+
     let ids = models.map(m => m.id);
-    return this.db.query(`SELECT * FROM ${this.constructor.tableName} WHERE ${foreignKey}=ANY($ids)`, {ids})
+    return this.db.query(`
+      SELECT *
+      FROM ${this.constructor.tableName}
+      WHERE ${foreignKey}=ANY($ids)
+    `, {ids})
+      .bind(this)
       .then(this.instantiateModels)
       .then((relatedModels) => {
         let relatedModelsByForeignKeyMap = _.groupBy(relatedModels, foreignKey);
