@@ -46,6 +46,14 @@ CREATE TRIGGER log_trigger
   FOR EACH ROW EXECUTE PROCEDURE log();
 
 --
+-- Users
+--
+
+ALTER TABLE all_users ADD COLUMN team_id TEXT NULL;
+DROP VIEW users;
+CREATE VIEW users AS SELECT * FROM all_users WHERE deleted_at IS NULL;
+
+--
 -- SubscriptionPlans
 --
 

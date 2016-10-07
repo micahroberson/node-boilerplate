@@ -13,5 +13,9 @@ DROP VIEW teams;
 DROP TABLE all_teams;
 DROP TABLE logs.all_teams;
 
+DROP VIEW users;
+ALTER TABLE all_users DROP COLUMN team_id;
+CREATE VIEW users AS SELECT * FROM all_users WHERE deleted_at IS NULL;
+
 DROP TABLE all_payment_methods;
 DROP TABLE logs.all_payment_methods;
