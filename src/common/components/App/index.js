@@ -1,6 +1,6 @@
 import React from 'react';
 import connectToStores from 'fluxible-addons-react/connectToStores';
-import UserStore from '../../stores/UserStore';
+import UsersStore from '../../stores/UsersStore';
 import User from '../../models/User';
 import Navigation from '../Navigation';
 
@@ -30,10 +30,10 @@ class App extends React.Component {
   }
 }
 
-App = connectToStores(App, [UserStore], (context, props) => {
+App = connectToStores(App, [UsersStore], (context, props) => {
   return {
-    currentUser: context.getStore(UserStore).getCurrentUser()
+    currentUser: context.getStore(UsersStore).getCurrentUser()
   };
 });
 
-export default App
+export default App;

@@ -4,7 +4,7 @@ import {Link} from 'react-router';
 import {css} from 'aphrodite/no-important';
 import connectToStores from 'fluxible-addons-react/connectToStores';
 import userActions from '../../actions/userActions';
-import UserStore from '../../stores/UserStore';
+import UsersStore from '../../stores/UsersStore';
 import {RequestStates} from '../../stores/BaseStore';
 import shouldComponentUpdatePure from '../../lib/shouldComponentUpdatePure';
 import styles from './styles';
@@ -275,8 +275,8 @@ class AuthForm extends React.Component {
 
 export let undecorated = AuthForm;
 
-AuthForm = connectToStores(AuthForm, [UserStore], (context, props) => {
-  let {state, error} = context.getStore(UserStore).getEventData(ModeEventMap[props.mode]);
+AuthForm = connectToStores(AuthForm, [UsersStore], (context, props) => {
+  let {state, error} = context.getStore(UsersStore).getEventData(ModeEventMap[props.mode]);
   return {
     requestState: state,
     error: error
