@@ -21,7 +21,13 @@ class Base {
     for(let relationName in belongsToRelations) {
       let relation = belongsToRelations[relationName];
       relation.foreign_key = relation.foreign_key || `${relationName}_id`;
-      this[relation.foreign_key] = values[relation.foreign_key] || null;
+      if(values[relation.foreign_key]) {
+        this[relation.foreign_key] = values[relation.foreign_key];
+      } else if(values[relationName] && values[relationName].id) {
+        this[relation.foreign_key] = values[relationName].id;
+      } else {
+        this[relation.foreign_key] = null;
+      }
     }
 
     for(let key in values) {

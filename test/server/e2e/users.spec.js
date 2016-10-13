@@ -13,7 +13,7 @@ describe('/users', () => {
       return loadFixtures('users');
     });
     after(() => {
-      return unloadFixtures('user_sessions', 'all_users');
+      return unloadFixtures('user_sessions', 'all_teams', 'all_users');
     });
     describe('when an invalid payload is provided', () => {
       describe('when the email is already taken', () => {
@@ -86,7 +86,7 @@ describe('/users', () => {
       return loadFixtures('users');
     });
     after(() => {
-      return unloadFixtures('user_sessions', 'all_users');
+      return unloadFixtures('user_sessions', 'all_teams', 'all_users');
     });
     describe('when an invalid email & password are provided', () => {
       it('responds with an error', (done) => {
@@ -136,7 +136,7 @@ describe('/users', () => {
       return loadFixtures('users', 'user_sessions');
     });
     after(() => {
-      return unloadFixtures('user_sessions', 'all_users');
+      return unloadFixtures('user_sessions', 'all_teams', 'all_users');
     });
     describe('when a valid email & password are provided', () => {
       it('responds with a session_token and user', (done) => {
@@ -161,7 +161,7 @@ describe('/users', () => {
       return loadFixtures('users', 'user_sessions');
     });
     after(() => {
-      return unloadFixtures('user_sessions', 'all_users');
+      return unloadFixtures('user_sessions', 'all_teams', 'all_users');
     });
     describe('when a valid email & password are provided', () => {
       it('responds with the updated user', (done) => {
@@ -191,7 +191,7 @@ describe('/users', () => {
       return loadFixtures('users');
     });
     after(() => {
-      return unloadFixtures('user_sessions', 'all_users');
+      return unloadFixtures('user_sessions', 'all_teams', 'all_users');
     });
     describe('when an invalid email is provided', () => {
       it('responds with an error', (done) => {
@@ -235,7 +235,7 @@ describe('/users', () => {
       return loadFixtures('users');
     });
     after(() => {
-      return unloadFixtures('user_sessions', 'all_users');
+      return unloadFixtures('user_sessions', 'all_teams', 'all_users');
     });
     describe('when an invalid token is provided', () => {
       it('responds with an error', (done) => {

@@ -121,7 +121,10 @@ export function serializeTeam(team) {
     id: team.id,
     name: team.name,
     primary_payment_method_id: team.primary_payment_method_id,
-    primary_user_id: team.primary_user_id
+    primary_user_id: team.primary_user_id,
+    payment_methods: [],
+    subscriptions: [],
+    users: []
   };
   if(team.subscriptions && team.subscriptions.length) {
     json.subscription = serializeSubscription(team.subscriptions[0]);
