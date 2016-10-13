@@ -1,4 +1,6 @@
+import Promise from 'bluebird';
 import express from 'express';
+import useragent from 'express-useragent';
 import serialize from 'serialize-javascript';
 import CookieDough from 'cookie-dough';
 import cookieParser from 'cookie-parser';
@@ -7,8 +9,10 @@ import React from 'react';
 import app from '../../../common/app.js';
 import Html from '../../../common/components/Html';
 import ApiPlugin from '../../../common/plugins/ApiPlugin';
+import teamActions from '../../../common/actions/teamActions';
 import userActions from '../../../common/actions/userActions';
 import {FluxibleComponent} from 'fluxible-addons-react';
+import ContextProvider from '../../../common/components/ContextProvider';
 import {match, RouterContext} from 'react-router';
 import {StyleSheetServer} from 'aphrodite';
 
@@ -20,6 +24,7 @@ class AppRouter {
 
   setupRoutes(environment) {
     this.routes.use(cookieParser());
+    this.routes.use(useragent.express());
 
     this.routes.get('/sign-out', (req, res, next) => {
       let cookie = new CookieDough(req);
@@ -27,9 +32,12 @@ class AppRouter {
       return res.redirect('/');
     });
 
-    let fetchUser = (context, sessionToken, cb) => {
-      if(!sessionToken) {return cb();}
-      context.executeAction(userActions.me, {}, cb);
+    let fetchUserAndTeam = (context, sessionToken) => {
+      if(!sessionToken) {return Promise.resolve();}
+      return Promise.all([
+        context.executeAction(userActions.me, {}),
+        context.executeAction(teamActions.team, {})
+      ]);
     };
 
     this.routes.get('*', (req, res, next) => {
@@ -46,9 +54,9 @@ class AppRouter {
         sessionToken: cookie.get('st')
       }));
 
-      let context = app.createContext();
+      let context = app.createContext({userAgent: req.useragent});
       let componentContext = context.getComponentContext();
-      fetchUser(context, cookie.get('st'), () => {
+      fetchUserAndTeam(context, cookie.get('st')).then(() => {
         match({
           routes: app.getComponent()(componentContext),
           location: req.url
@@ -59,15 +67,15 @@ class AppRouter {
 
           let exposed = `window.App=${serialize(app.dehydrate(context))};`;
           let markupElement = React.createElement(
-            FluxibleComponent,
-            {context: context.getComponentContext()},
+            ContextProvider,
+            {context: componentContext},
             React.createElement(RouterContext, renderProps)
           );
           let {html, css} = StyleSheetServer.renderStatic(() => {
             return renderToString(markupElement);
           });
           let htmlProps = {
-            context: context.getComponentContext(),
+            context: componentContext,
             state: exposed,
             css: css,
             markup: html
@@ -75,6 +83,9 @@ class AppRouter {
           let fullMarkup = renderToStaticMarkup(<Html {...htmlProps} />);
           res.status(200).send(fullMarkup);
         });
+      })
+      .catch((error) => {
+        next(error);
       });
     });
   }
