@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="30px" height="20px" viewBox="0 0 30 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 3.7.2 (28276) - http://www.bohemiancoding.com/sketch -->
+    <title>card_mastercard</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="card_mastercard">
+            <g id="MC">
+                <rect id="Rectangle-11" fill="#316AB3" x="0" y="0" width="30" height="20" rx="2"></rect>
+                <g id="Oval-1-+-Oval-2-+-Oval-4" transform="translate(7.000000, 5.000000)">
+                    <circle id="Oval-1" fill="#F7635F" cx="5" cy="5" r="5"></circle>
+                    <circle id="Oval-2" fill="#FFB548" cx="12" cy="5" r="5"></circle>
+                    <path d="M8.5,8.5707164 C9.42568112,7.66325473 10,6.39869705 10,5 C10,3.60130295 9.42568112,2.33674527 8.5,1.4292836 C7.57431888,2.33674527 7,3.60130295 7,5 C7,6.39869705 7.57431888,7.66325473 8.5,8.5707164 Z" id="Oval-4" fill="#FF8150"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

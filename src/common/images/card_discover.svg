@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="30px" height="20px" viewBox="0 0 30 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 3.7.2 (28276) - http://www.bohemiancoding.com/sketch -->
+    <title>card_discover</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="30" height="20" rx="2"></rect>
+        <linearGradient x1="50.0000192%" y1="104.79137%" x2="50.0000157%" y2="-4.04677609%" id="linearGradient-3">
+            <stop stop-color="#FB6503" offset="0%"></stop>
+            <stop stop-color="#EE7E00" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="card_discover">
+            <g id="discover">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <use id="Rectangle-11" fill="#FFF3EA" xlink:href="#path-1"></use>
+                <path d="M-4.5,20.5830108 L30.9907619,20.5830108 C32.4690508,20.5830108 33.67856,19.3735016 33.67856,17.8952126 L33.67856,17.8952126 L33.67856,3.10210921 C29.3639272,8.61334971 17.7675117,19.3170579 -4.5,20.5830108" id="Swoosh" fill="url(#linearGradient-3)" mask="url(#mask-2)"></path>
+                <circle id="Oval-6" fill="#F66F02" mask="url(#mask-2)" cx="15" cy="9.5" r="3.5"></circle>
+            </g>
+        </g>
+    </g>
+</svg>
