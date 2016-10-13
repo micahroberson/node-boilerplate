@@ -1,6 +1,7 @@
 import React from 'react';
 import {IndexRoute, Route} from 'react-router';
 import UsersStore from '../stores/UsersStore';
+import TeamsStore from '../stores/TeamsStore';
 import App from './App';
 import Home from './Home';
 import SignIn from './SignIn';
@@ -18,7 +19,13 @@ let routes = (componentContext) => {
   let getWrapperComponent = (Handler) => {
     return (props) => {
       let currentUser = componentContext.getStore(UsersStore).getCurrentUser();
-      return <Handler currentUser={currentUser} {...props} />;
+      let currentTeam = componentContext.getStore(TeamsStore).getCurrentTeam();
+      let combinedProps = {
+        ...props,
+        currentUser,
+        currentTeam
+      };
+      return <Handler {...combinedProps} />;
     }
   };
   return (

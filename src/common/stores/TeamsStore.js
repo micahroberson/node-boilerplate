@@ -7,7 +7,10 @@ class TeamsStore extends BaseStore {
   static handlers = {
     'TEAM_CREATE_START'   : 'baseHandler',
     'TEAM_CREATE_SUCCESS' : 'setCurrentTeam',
-    'TEAM_CREATE_FAILURE' : 'baseHandler'
+    'TEAM_CREATE_FAILURE' : 'baseHandler',
+    'TEAM_TEAM_START'     : 'baseHandler',
+    'TEAM_TEAM_SUCCESS'   : 'setCurrentTeam',
+    'TEAM_TEAM_FAILURE'   : 'baseHandler'
   };
 
   constructor(dispatcher) {

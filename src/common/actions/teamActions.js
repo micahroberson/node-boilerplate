@@ -5,11 +5,6 @@ import {browserHistory} from 'react-router';
 const teamActions = {
   create: (context, payload) => {
     context.dispatch('TEAM_CREATE_START', null);
-    if(!payload.subscription_plan) {
-      let error = new Error('You must select a subscription plan');
-      context.dispatch('TEAM_CREATE_FAILURE', {error});
-      return Promise.resolve(null);
-    }
     return context
       .api
       .teams
@@ -21,6 +16,26 @@ const teamActions = {
       })
       .catch((error) => {
         context.dispatch('TEAM_CREATE_FAILURE', {error});
+        return null;
+      });
+  },
+  team: (context, payload) => {
+    context.dispatch('TEAM_TEAM_START', null);
+    return context
+      .api
+      .teams
+      .team({})
+      .then((responsePayload) => {
+        let team = null;
+        if(responsePayload.team) {
+          team = new Team(responsePayload.team);
+        }
+        context.dispatch('TEAM_TEAM_SUCCESS', team);
+        return team;
+      })
+      .catch((error) => {
+        // console.log(error);
+        context.dispatch('TEAM_TEAM_FAILURE', {error});
         return null;
       });
   }
