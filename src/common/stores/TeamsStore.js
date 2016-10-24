@@ -5,12 +5,18 @@ class TeamsStore extends BaseStore {
   static storeName = 'TeamsStore';
   static baseEventName = 'TEAM';
   static handlers = {
-    'TEAM_CREATE_START'   : 'baseHandler',
-    'TEAM_CREATE_SUCCESS' : 'setCurrentTeam',
-    'TEAM_CREATE_FAILURE' : 'baseHandler',
-    'TEAM_TEAM_START'     : 'baseHandler',
-    'TEAM_TEAM_SUCCESS'   : 'setCurrentTeam',
-    'TEAM_TEAM_FAILURE'   : 'baseHandler'
+    'TEAM_CREATE_START'               : 'baseHandler',
+    'TEAM_CREATE_SUCCESS'             : 'setCurrentTeam',
+    'TEAM_CREATE_FAILURE'             : 'baseHandler',
+    'TEAM_TEAM_START'                 : 'baseHandler',
+    'TEAM_TEAM_SUCCESS'               : 'setCurrentTeam',
+    'TEAM_TEAM_FAILURE'               : 'baseHandler',
+    'TEAM_ADD_PAYMENT_METHOD_START'   : 'baseHandler',
+    'TEAM_ADD_PAYMENT_METHOD_SUCCESS' : 'setCurrentTeam',
+    'TEAM_ADD_PAYMENT_METHOD_FAILURE' : 'baseHandler',
+    'TEAM_UPDATE_START'               : 'baseHandler',
+    'TEAM_UPDATE_SUCCESS'             : 'setCurrentTeam',
+    'TEAM_UPDATE_FAILURE'             : 'baseHandler',
   };
 
   constructor(dispatcher) {

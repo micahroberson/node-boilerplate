@@ -3,9 +3,9 @@ import { BaseStore as FluxibleBaseStore } from 'fluxible/addons';
 import User from '../models/User';
 
 export const RequestStates = {
-  'Started': 'started',
-  'Success': 'success',
-  'Failure': 'failure'
+  Started: 'started',
+  Success: 'success',
+  Failure: 'failure'
 };
 
 const EventStateToRequestStateMap = {
@@ -24,7 +24,7 @@ export function registerHandlers(Store) {
     if(handlerName !== 'baseHandler') {
       definedHandler = Store.prototype[handlerName];
     }
-    Store.prototype[dynamicHandler] = function(payload) {
+    Store.prototype[dynamicHandler] = function baseHandler(payload) {
       this.logEventState(action, EventStateToRequestStateMap[state], (payload ? payload.error : null));
       if(definedHandler) {
         definedHandler.call(this, payload);

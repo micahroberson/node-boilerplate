@@ -21,6 +21,12 @@ class Teams extends Resource {
       path: '/teams/add-payment-method',
       method: 'POST'
     });
+
+    this.update = Resource.createEndpoint({
+      authRequired: true,
+      path: '/teams/update',
+      method: 'POST'
+    });
   }
 }
 

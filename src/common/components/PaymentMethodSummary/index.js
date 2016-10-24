@@ -25,37 +25,28 @@ class PaymentMethodSummary extends React.Component {
 
   render() {
     let {paymentMethod, includeLeadingBullets, includeExpiration} = this.props;
-    let paymentMethodDetails = paymentMethod.details;
     let iconStyle = css(styles.creditCardIconDefault);
-    let lastFour = null;
     let expiration = null;
-    if(paymentMethod.type === 'apple_pay') {
-      iconStyle = css(styles.creditCardIconApplePay);
-    } else if(paymentMethod.type === 'android_pay') {
-      iconStyle = css(styles.creditCardIconAndroidPay);
-    } else {
-      let cardType = paymentMethodDetails.type;
-      let leadingBullets = includeLeadingBullets ? '•••• ' : null;
-      switch(cardType) {
-        case 'Visa':
-          iconStyle = css(styles.creditCardIconVisa);
-          break;
-        case 'American Express':
-          iconStyle = css(styles.creditCardIconAmericanExpress);
-          break;
-        case 'MasterCard':
-          iconStyle = css(styles.creditCardIconMasterCard);
-          break;
-        case 'Discover':
-          iconStyle = css(styles.creditCardIconDiscover);
-          break;
-      }
-      lastFour = (
-        <span className={css(styles.lastFour)}>{leadingBullets}{paymentMethodDetails.last_four}</span>
-      );
+    let leadingBullets = includeLeadingBullets ? '•••• ' : null;
+    switch(paymentMethod.brand) {
+      case 'Visa':
+        iconStyle = css(styles.creditCardIconVisa);
+        break;
+      case 'American Express':
+        iconStyle = css(styles.creditCardIconAmericanExpress);
+        break;
+      case 'MasterCard':
+        iconStyle = css(styles.creditCardIconMasterCard);
+        break;
+      case 'Discover':
+        iconStyle = css(styles.creditCardIconDiscover);
+        break;
     }
-    if(includeExpiration && paymentMethodDetails.expiration_month && paymentMethodDetails.expiration_year) {
-      expiration = <span className={css(styles.ccExpiration)}>Exp {paymentMethodDetails.expiration_month}/{paymentMethodDetails.expiration_year.slice(-2)}</span>;
+    let lastFour = (
+      <span className={css(styles.lastFour)}>{leadingBullets}{paymentMethod.last_four}</span>
+    );
+    if(includeExpiration && paymentMethod.expiration_month && paymentMethod.expiration_year) {
+      expiration = <span className={css(styles.ccExpiration)}>Exp {paymentMethod.expiration_month}/{paymentMethod.expiration_year.slice(-2)}</span>;
     }
     return (
       <span className={this.props.className}>
