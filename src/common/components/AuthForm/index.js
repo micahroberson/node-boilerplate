@@ -28,7 +28,7 @@ const ModeEventMap = {
 class AuthForm extends React.Component {
   static propTypes = {
     requestState: React.PropTypes.string,
-    error: React.PropTypes.object,
+    requestError: React.PropTypes.object,
     mode: React.PropTypes.oneOf(_.values(Modes)),
     passwordResetToken: React.PropTypes.string // If mode == ResetPassword
   };
@@ -144,9 +144,9 @@ class AuthForm extends React.Component {
   }
 
   renderError() {
-    let {requestState, error} = this.props;
-    if(!error) {return;}
-    return <h4 className={css(styles.error)}>{error.message}</h4>;
+    let {requestState, requestError} = this.props;
+    if(!requestError) {return;}
+    return <h4 className={css(styles.error)}>{requestError.message}</h4>;
   }
 
   render() {
@@ -279,7 +279,7 @@ AuthForm = connectToStores(AuthForm, [UsersStore], (context, props) => {
   let {state, error} = context.getStore(UsersStore).getEventData(ModeEventMap[props.mode]);
   return {
     requestState: state,
-    error: error
+    requestError: error
   };
 });
 

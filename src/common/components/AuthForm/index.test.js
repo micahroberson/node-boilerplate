@@ -220,7 +220,7 @@ describe('<AuthForm />', () => {
           wrapper.setProps({requestState: RequestStates.Started});
           wrapper.setProps({
             requestState: RequestStates.Failure,
-            error: {message: 'Error message'}
+            requestError: {message: 'Error message'}
           });
         });
 
