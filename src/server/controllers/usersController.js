@@ -97,7 +97,6 @@ const usersController = {
   },
 
   update(ctx, payload) {
-    if(ctx.session.user.id !== payload.id) {return Promise.reject(new UnauthorizedAccessError());}
     return ctx.usersRepository.update(ctx.session.user, payload)
       .then((user) => {
         return {user: serializeUser(user)};

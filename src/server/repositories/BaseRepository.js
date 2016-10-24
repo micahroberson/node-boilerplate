@@ -7,6 +7,7 @@ class BaseRepository {
   static modelClass = null;
 
   constructor(ctx) {
+    this.ctx = ctx;
     this.db = ctx.providerClients.postgresProviderClient;
     this.queue = ctx.providerClients.bullQueueProviderClient;
     this.mailer = ctx.providerClients.mailerProviderClient;
