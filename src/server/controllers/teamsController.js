@@ -72,7 +72,25 @@ const teamsController = {
       .catch(rollbackTransaction)
       .then(assignSerializationDependencies)
       .then(serializeResponse);
-  }
+  },
+
+  update(ctx, payload) {
+    if(!ctx.session.user.team_id) {
+      return Promise.reject(new ParametersInvalidError('User does not belong to a team'));
+    }
+    let updateTeam = (team) => {
+      let params = _.pick(payload, ['primary_payment_method_id']);
+      return ctx.teamsRepository.update(team, params);
+    };
+    return ctx.teamsRepository.findById(ctx.session.user.team_id)
+      .bind(ctx)
+      .then(beginTransaction)
+      .then(updateTeam)
+      .then(commitTransaction)
+      .catch(rollbackTransaction)
+      .then(assignSerializationDependencies)
+      .then(serializeResponse);
+  },
 };
 
 export default teamsController;

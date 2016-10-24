@@ -62,6 +62,7 @@ class ApiRouter {
 
     this.routes.post('/teams/create', this.authorize, this.controllerActionHandler(teamsController.create))
     this.routes.post('/teams/team', this.authorize, this.controllerActionHandler(teamsController.team))
+    this.routes.post('/teams/update', this.authorize, this.controllerActionHandler(teamsController.update))
     this.routes.post('/teams/add-payment-method', this.authorize, this.controllerActionHandler(teamsController.addPaymentMethod))
 
     this.routes.use((req, res) => {
