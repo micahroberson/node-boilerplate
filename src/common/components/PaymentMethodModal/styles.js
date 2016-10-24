@@ -1,6 +1,6 @@
 import {StyleSheet} from 'aphrodite/no-important';
 import colors from '../../lib/colors';
-import {creditCardIcons, mediaQueries} from '../../lib/mixins';
+import {creditCardIcons, mediaQueries, clearfix} from '../../lib/mixins';
 
 const baseInputStyle = {
   backgroundColor: '#ffffff',
@@ -43,9 +43,11 @@ const styles = StyleSheet.create({
     fontSize: '16px'
   },
   error: {
+    display: 'block',
     border: `1px solid ${colors.jellyBean}`,
     color: colors.jellyBean,
     borderRadius: '3px',
+    padding: '8px 12px',
     margin: '0 0 15px',
     textAlign: 'center',
   },
@@ -81,19 +83,27 @@ const styles = StyleSheet.create({
   },
   ccCvcInput: {
     ...baseInputStyle,
-    width: '120px'
+    width: '120px',
+  },
+  ccInputInvalid: {
+    borderColor: colors.jellyBean,
+    ':focus': {
+      borderColor: colors.jellyBean,
+    }
   },
   form: {
 
   },
   inputContainer: {
     position: 'relative',
-
   },
   footer: {
+    ...clearfix,
+    textAlign: 'right',
     margin: '15px 0 0',
   },
   securityMessage: {
+    float: 'left',
     color: colors.black35,
   }
 });

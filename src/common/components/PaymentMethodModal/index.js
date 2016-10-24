@@ -26,12 +26,19 @@ class PaymentMethodModal extends React.Component {
 
   static propTypes = {
     selectedPaymentMethodId: React.PropTypes.string,
-    paymentMethods: React.PropTypes.object,
+    paymentMethods: React.PropTypes.array,
     mode: React.PropTypes.string,
+    loading: React.PropTypes.bool,
+    error: React.PropTypes.object,
     onCancel: React.PropTypes.func.isRequired,
     onAdd: React.PropTypes.func.isRequired,
     onRemove: React.PropTypes.func,
     onSelect: React.PropTypes.func
+  };
+
+  static defaultProps = {
+    loading: false,
+    error: null
   };
 
   constructor(props) {
@@ -48,8 +55,8 @@ class PaymentMethodModal extends React.Component {
     }
     return {
       mode,
-      error: null,
-      loading: false,
+      error: props.error,
+      loading: props.loading,
       selectedPaymentMethodId: props.selectedPaymentMethodId,
       formValues: {
         number: '',
@@ -71,7 +78,13 @@ class PaymentMethodModal extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState(this.getStateFromProps(nextProps));
+    let {loading, error} = this.props;
+    if(loading !== nextProps.loading) {
+      this.setState({loading: nextProps.loading});
+    }
+    if(error !== nextProps.error) {
+      this.setState({error: nextProps.error});
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -96,7 +109,7 @@ class PaymentMethodModal extends React.Component {
           state = 'empty';
         } else {
           value = this.isMobile ? value.slice(0, 16) : formatCreditCardNumber(value);
-          state = value.length < 14 ? 'valid' : (Stripe.card.validateCardNumber(value) ? 'valid' : 'invalid');
+          state = value.length < 14 ? FormStates.Valid : (Stripe.card.validateCardNumber(value) ? FormStates.Valid : FormStates.Invalid);
         }
         break;
       case 'exp_month':
@@ -104,8 +117,8 @@ class PaymentMethodModal extends React.Component {
           state = 'empty';
         } else {
           value = value.slice(0, 2);
-          state = 'valid';
-          if(parseInt(value) > 12) {state = 'invalid';}
+          state = FormStates.Valid;
+          if(parseInt(value) > 12) {state = FormStates.Invalid;}
         }
        break;
       case 'exp_year':
@@ -113,7 +126,7 @@ class PaymentMethodModal extends React.Component {
           state = 'empty';
         } else {
           value = value.slice(0, 2);
-          state = (value.length === 2 && parseInt(value) < 16) ? 'invalid' : 'valid';
+          state = (value.length === 2 && parseInt(value) < 16) ? FormStates.Invalid : FormStates.Valid;
         }
         break;
       case 'cvc':
@@ -121,7 +134,7 @@ class PaymentMethodModal extends React.Component {
           state = 'empty';
         } else {
           value = value.slice(0, 4);
-          state = value.length < 3 ? 'valid' : (Stripe.card.validateCVC(value) ? 'valid' : 'invalid');
+          state = value.length < 3 ? FormStates.Valid : (Stripe.card.validateCVC(value) ? FormStates.Valid : FormStates.Invalid);
         }
         break;
     }
@@ -152,7 +165,7 @@ class PaymentMethodModal extends React.Component {
       this.setState({loading : true});
       createStripeToken(this.state.formValues, this.state.formStates, (error, updatedFormStates, stripeTokenObject) => {
         if(error) {
-          this.setState({
+          return this.setState({
             loading: false,
             error: error,
             formStates: updatedFormStates
@@ -195,7 +208,7 @@ class PaymentMethodModal extends React.Component {
 
   renderError() {
     if(!this.state.error) {return null;}
-    return <span className={css(styles.error)}>{this.state.error}</span>;
+    return <span className={css(styles.error)}>{this.state.error.message}</span>;
   }
 
   renderPaymentMethods(paymentMethods) {
@@ -399,7 +412,7 @@ function createStripeToken(values, states, cb) {
   Stripe.card.createToken(values, (status, response) => {
     if(response.error) {
       let field = response.error.param;
-      return cb(response.error.message, {
+      return cb(response.error, {
         ...states,
         [field]: FormStates.Invalid,
       }, null);
