@@ -4,7 +4,7 @@ export const Intervals = {
   Day: 'day',
   Week: 'week',
   Month: 'month',
-  Year: 'year'
+  Year: 'year',
 };
 
 class SubscriptionPlan extends Base {
@@ -19,4 +19,4 @@ class SubscriptionPlan extends Base {
   }
 }
 
-export default SubscriptionPlan
+export default SubscriptionPlan;
