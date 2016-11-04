@@ -3,6 +3,8 @@ import Promise from 'bluebird';
 import PaymentMethod from '../../common/models/PaymentMethod';
 import Team from '../../common/models/Team';
 import {serializeUser} from './usersController';
+import {serializeSubscription} from './subscriptionsController';
+import {beginTransaction, commitTransaction, rollbackTransaction} from './helpers';
 import {ParametersInvalidError, UnauthorizedAccessError} from '../lib/errors/APIError';
 
 const teamsController = {
@@ -111,23 +113,6 @@ function assignSerializationDependencies(team) {
     .then(assignSubscriptions)
     .then(assignUsers);
 }
-function beginTransaction(team) {
-  return this.providerClients.postgresProviderClient
-    .transaction()
-    .return(team);
-}
-function commitTransaction(team) {
-  return this.providerClients.postgresProviderClient
-    .commit()
-    .return(team);
-}
-function rollbackTransaction(error) {
-  return this.providerClients.postgresProviderClient
-    .rollback()
-    .then(() => {
-      throw error;
-    });
-}
 
 function serializeResponse(team) {
   return {team: serializeTeam(team)};
@@ -145,7 +130,7 @@ export function serializeTeam(team) {
     users: []
   };
   if(team.subscriptions && team.subscriptions.length) {
-    json.subscription = serializeSubscription(team.subscriptions[0]);
+    json.subscriptions = team.subscriptions.map(s => serializeSubscription(s));
   }
   if(team.payment_methods) {
     json.payment_methods = team.payment_methods.map(pm => serializePaymentMethod(pm));
@@ -163,14 +148,5 @@ export function serializePaymentMethod(paymentMethod) {
     last_four: paymentMethod.last_four,
     expiration_month: paymentMethod.expiration_month,
     expiration_year: paymentMethod.expiration_year
-  };
-}
-
-export function serializeSubscription(subscription) {
-  return {
-    id: subscription.id,
-    status: subscription.status,
-    current_period_start: subscription.current_period_start,
-    current_period_end: subscription.current_period_end
   };
 }
