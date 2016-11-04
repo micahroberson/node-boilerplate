@@ -29,19 +29,22 @@ class Base {
         this[relation.foreign_key] = null;
       }
     }
+    // Set embeds relations
+    for(let relationName in embedsRelations) {
+      let relation = embedsRelations[relationName];
+      let val = values[relationName] || {};
+      if (!(val instanceof relation.class)) {
+        val = relation.factory ? relation.factory.create(val) : new relation.class(val);
+      }
+      this[`${relationName}`] = val;
+    }
 
     for(let key in values) {
       let val = values[key];
       if(!val) {continue;}
 
       let relation;
-      if (relation = embedsRelations[key]) {
-        if (!(val instanceof relation.class)) {
-          val = relation.factory ? relation.factory.create(val) : new relation.class(val);
-        }
-        this[`${key}`] = val;
-      }
-      else if (relation = hasManyRelations[key]) {
+      if (relation = hasManyRelations[key]) {
         this[`${key}`] = val.map(v => {
           if (!(v instanceof relation.class)) {
             v = relation.factory ? relation.factory.create(v) : new relation.class(v);
