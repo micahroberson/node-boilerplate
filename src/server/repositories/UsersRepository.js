@@ -116,7 +116,8 @@ class UsersRepository extends BaseRepository {
       email_verification_token_sent_at: user.email_verification_token_sent_at,
       password_reset_token: user.password_reset_token,
       password_reset_token_redeemed_at: user.password_reset_token_redeemed_at,
-      password_reset_token_sent_at: user.password_reset_token_sent_at
+      password_reset_token_sent_at: user.password_reset_token_sent_at,
+      permissions: JSON.stringify(_.cloneDeep(user.permissions)),
     };
   }
 }

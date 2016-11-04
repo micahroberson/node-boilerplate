@@ -60,6 +60,7 @@ class BaseRepository {
   }
 
   findbyIds(ids) {
+    if(!ids.length) {return Promise.resolve([]);}
     return this.db.query(`
       SELECT *
       FROM ${this.constructor.tableName}

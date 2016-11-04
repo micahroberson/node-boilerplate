@@ -25,3 +25,5 @@ export class UnauthorizedAccessError extends APIError {
     super(values);
   }
 }
+
+export class InactiveSubscriptionError extends APIError {}
