@@ -5,7 +5,7 @@ import named from 'node-postgres-named';
 import moment from 'moment';
 
 // Use moment for parsing timestamp-without-timezone
-pg.types.setTypeParser(1114, str => {console.log(moment.utc(str).toDate());return moment.utc(str).toDate()});
+pg.types.setTypeParser(1114, str => moment.utc(str).toDate());
 
 class PostgresProvider extends BaseProvider {
   connect() {
