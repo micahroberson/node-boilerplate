@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import Subscription, {SubscriptionStatuses} from '../../common/models/Subscription';
-import {beginTransaction, commitTransaction, rollbackTransaction} from './helpers';
+import {beginTransaction, commitTransaction, rollbackTransaction, toUnixTimestamp} from './helpers';
 import {serializeSubscriptionPlan} from './subscriptionPlansController';
 import {ParametersInvalidError, UnauthorizedAccessError} from '../lib/errors/APIError';
 
@@ -93,8 +93,8 @@ export function serializeSubscription(subscription) {
   return {
     id: subscription.id,
     status: subscription.status,
-    current_period_start: subscription.current_period_start,
-    current_period_end: subscription.current_period_end,
+    current_period_start: toUnixTimestamp(subscription.current_period_start),
+    current_period_end: toUnixTimestamp(subscription.current_period_end),
     subscription_plan: subscription.subscription_plan ? serializeSubscriptionPlan(subscription.subscription_plan) : null,
   };
 }

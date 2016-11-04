@@ -33,6 +33,20 @@ class SubscriptionsRepository extends BaseRepository {
     return super.update(subscription, payload);
   }
 
+  assignManyTo(...args) {
+    return super.assignManyTo(...args)
+      .then((entity) => {
+        // Sort subsriptions for each
+        entity.subscriptions = _.sortBy(entity.subscriptions, (subscription) => {
+          if(subscription.status === SubscriptionStatuses.Active || subscription.status === SubscriptionStatuses.Trialing) {
+            return 0;
+          }
+          return subscription.created_at.getTime();
+        });
+        return entity;
+      });
+  }
+
   _createStripeSubscription(subscription) {
     if(!subscription.team) {throw new Error('Subscription must have team assigned.');}
     if(!subscription.team.primary_payment_method_id) {throw new Error('Team must have a primary payment method.');}

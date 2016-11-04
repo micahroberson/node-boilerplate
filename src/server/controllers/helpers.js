@@ -17,3 +17,9 @@ export function rollbackTransaction(error) {
       throw error;
     });
 }
+
+export function toUnixTimestamp(date) {
+  if(!date) {return null;}
+  return ~~((date.getTime() + date.getTimezoneOffset()*60*1000)/1000);
+}
+

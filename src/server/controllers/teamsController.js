@@ -126,11 +126,11 @@ export function serializeTeam(team) {
     primary_payment_method_id: team.primary_payment_method_id,
     primary_user_id: team.primary_user_id,
     payment_methods: [],
-    subscriptions: [],
+    subscription: null,
     users: []
   };
   if(team.subscriptions && team.subscriptions.length) {
-    json.subscriptions = team.subscriptions.map(s => serializeSubscription(s));
+    json.subscription = serializeSubscription(team.subscriptions[0]); // Sorted via assignManyTo in TeamsRepository
   }
   if(team.payment_methods) {
     json.payment_methods = team.payment_methods.map(pm => serializePaymentMethod(pm));
