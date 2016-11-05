@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   },
   paymentMethod: {
     display: 'flex',
-    margin: '8px 0 0',
+    margin: '5px 0',
   },
   removePaymentMethodButton: {
     lineHeight: '20px',

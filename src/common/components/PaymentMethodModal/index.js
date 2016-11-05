@@ -87,12 +87,6 @@ class PaymentMethodModal extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if(prevState.mode !== this.state.mode) {
-      this.trackViewEvent();
-    }
-  }
-
   handleOnChangePaymentMethod(id) {
     if(id === this.state.selectedPaymentMethodId) {return;}
     this.setState({selectedPaymentMethodId: id});

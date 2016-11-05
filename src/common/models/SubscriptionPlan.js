@@ -14,6 +14,7 @@ class SubscriptionPlan extends Base {
     this.name = values.name;
     this.interval = values.interval;
     this.amount_in_cents = values.amount_in_cents;
+    this.amount_text = values.amount_text; // Client
     this.stripe_plan_id = values.stripe_plan_id;
     this.stripe_plan_object = values.stripe_plan_object;
   }

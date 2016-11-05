@@ -60,9 +60,15 @@ class Settings extends React.Component {
 
   getStateFromProps(props) {
     let teamState = {
-      primaryPaymentMethodId: props.currentTeam ? props.currentTeam.primary_payment_method_id : null,
-      paymentMethods: props.currentTeam ? props.currentTeam.payment_methods : []
+      primaryPaymentMethodId: null,
+      paymentMethods: [],
+      subscription: null,
     };
+    if(props.currentTeam) {
+      teamState.primaryPaymentMethodId = props.currentTeam.primary_payment_method_id;
+      teamState.paymentMethods = props.currentTeam.payment_methods;
+      teamState.subscription = props.currentTeam.primary_subscription;
+    }
     return {
       ...teamState,
       email: props.currentUser.email,
@@ -226,7 +232,7 @@ class Settings extends React.Component {
   }
 
   render() {
-    let {email, name, isEditingUserSettings, isEditingTeamSettings} = this.state;
+    let {email, name, subscription, isEditingUserSettings, isEditingTeamSettings} = this.state;
     let {updateUserRequestState, updateUserRequestError, addPaymentMethodTeamRequestState, addPaymentMethodTeamRequestError, updateTeamRequestState, updateTeamRequestError} = this.props;
     let emailInputProps = {
       className: css(styles.input),
@@ -276,6 +282,10 @@ class Settings extends React.Component {
           <label>Primary payment method</label>
           {this.renderPaymentMethods()}
           {isEditingTeamSettings ? <button {...addNewPaymentMethodButtonProps}>Add new</button> : null}
+        </fieldset>
+        <fieldset>
+          <label>Current Subscription Plan</label>
+          <input type="text" disabled={true} value={`${subscription.subscription_plan.name} - ${subscription.subscription_plan.amount_text}`} />
         </fieldset>
         {this.renderPaymentMethodModal()}
       </div>

@@ -106,11 +106,16 @@ function assignSerializationDependencies(team) {
   let assignSubscriptions = (team) => {
     return this.subscriptionsRepository.assignManyTo(team);
   };
+  let assignSubscriptionPlans = (team) => {
+    return this.subscriptionPlansRepository.assignTo(team.subscriptions)
+      .return(team);
+  };
   let assignUsers = (team) => {
     return this.usersRepository.assignManyTo(team);
   };
   return assignPaymentMethods(team)
     .then(assignSubscriptions)
+    .then(assignSubscriptionPlans)
     .then(assignUsers);
 }
 
@@ -126,11 +131,11 @@ export function serializeTeam(team) {
     primary_payment_method_id: team.primary_payment_method_id,
     primary_user_id: team.primary_user_id,
     payment_methods: [],
-    subscription: null,
+    primary_subscription: null,
     users: []
   };
   if(team.subscriptions && team.subscriptions.length) {
-    json.subscription = serializeSubscription(team.subscriptions[0]); // Sorted via assignManyTo in TeamsRepository
+    json.primary_subscription = serializeSubscription(team.subscriptions[0]); // Sorted via assignManyTo in TeamsRepository
   }
   if(team.payment_methods) {
     json.payment_methods = team.payment_methods.map(pm => serializePaymentMethod(pm));

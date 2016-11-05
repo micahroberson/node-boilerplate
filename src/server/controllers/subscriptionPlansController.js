@@ -1,6 +1,7 @@
 import Promise from 'bluebird';
 import SubscriptionPlan from '../../common/models/SubscriptionPlan';
 import {ParametersInvalidError, UnauthorizedAccessError} from '../lib/errors/APIError';
+import {formatCurrency} from './helpers';
 
 const subscriptionPlansController = {
   create(ctx, payload) {
@@ -34,5 +35,6 @@ export function serializeSubscriptionPlan(subscriptionPlan) {
     name: subscriptionPlan.name,
     interval: subscriptionPlan.interval,
     amount_in_cents: subscriptionPlan.amount_in_cents,
+    amount_text: formatCurrency(subscriptionPlan.amount_in_cents, {withoutTrailingZeros: true}),
   };
 }
