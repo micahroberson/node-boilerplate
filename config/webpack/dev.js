@@ -22,6 +22,7 @@ let webpackIsomorphicToolsPlugin = new WebpackIsomorphicToolsPlugin(webpackIsomo
 module.exports = {
   entry: {
     app: [
+      'babel-polyfill',
       './src/client/index.js'
     ]
   },

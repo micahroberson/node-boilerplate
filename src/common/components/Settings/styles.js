@@ -1,6 +1,6 @@
 import {StyleSheet} from 'aphrodite/no-important';
 import colors from '../../lib/colors';
-import {clearfix} from '../../lib/mixins';
+import {clearfix, checkboxStyles} from '../../lib/mixins';
 
 let actionButton = {
   float: 'right',
@@ -9,6 +9,7 @@ let actionButton = {
 };
 
 const styles = StyleSheet.create({
+  ...checkboxStyles,
   Settings: {
     maxWidth: '960px',
     margin: '0 auto',
@@ -46,6 +47,16 @@ const styles = StyleSheet.create({
     padding: 0,
     color: colors.jellyBean,
   },
+  subscriptionPlanInput: {
+    lineHeight: '20px',
+    marginTop: '5px',
+    width: '100%',
+  },
+  changePlanButton: {
+    display: 'block',
+    padding: 0,
+    color: colors.jellyBean,
+  },
   input: {
     width: 300,
     borderBottom: `1px solid ${colors.black35}`,
@@ -58,41 +69,6 @@ const styles = StyleSheet.create({
     lineHeight: '20px',
     fontSize: '12px',
     color: colors.black35,
-  },
-  checkboxInput: {
-    position: 'absolute',
-    zIndex: -1,
-    opacity: 0,
-    ':checked + div': {
-      display: 'block',
-    },
-  },
-  checkboxLabel: {
-    position: 'relative',
-    width: 16,
-    height: 16,
-    display: 'inline-block',
-    cursor: 'pointer',
-    margin: '3px 8px 0 0',
-    border: `1px solid ${colors.black35}`,
-    borderRadius: 2,
-    verticalAlign: 'middle',
-  },
-  disabledCheckboxLabel: {
-    border: '1px solid transparent',
-    cursor: 'default',
-  },
-  checkboxCheckmark: {
-    display: 'none',
-    position: 'absolute',
-    top: 2,
-    left: 5,
-    width: 4,
-    height: 9,
-    transform: 'rotate(45deg)',
-    border: `solid ${colors.blackOlive}`,
-    borderWidth: '0 2px 2px 0',
-    background: 'transparent',
   },
   error: {
     color: colors.jellyBean,

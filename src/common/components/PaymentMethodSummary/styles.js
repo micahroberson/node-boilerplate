@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
   },
   ccLastFour: {
     verticalAlign: 'middle',
+    lineHeight: '20px',
   },
 });
 

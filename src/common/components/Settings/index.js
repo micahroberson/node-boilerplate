@@ -5,12 +5,14 @@ import connectToStores from 'fluxible-addons-react/connectToStores';
 import Team from '../../models/Team';
 import User from '../../models/User';
 import {RequestStates} from '../../stores/BaseStore';
+import SubscriptionsStore from '../../stores/SubscriptionsStore';
 import TeamsStore from '../../stores/TeamsStore';
 import UsersStore from '../../stores/UsersStore';
 import teamActions from '../../actions/teamActions';
 import userActions from '../../actions/userActions';
 import PaymentMethodModal from '../PaymentMethodModal';
 import PaymentMethodSummary from '../PaymentMethodSummary';
+import SubscriptionPlanModal from '../SubscriptionPlanModal';
 import styles from './styles';
 
 class Settings extends React.Component {
@@ -31,6 +33,7 @@ class Settings extends React.Component {
       isEditingTeamSettings: false,
       isEditingUserSettings: false,
       isPaymentMethodModalVisible: false,
+      isSubscriptionPlanModalVisible: false,
       paymentMethodModalKey: 0, // Generate new on click 'Add' to force new component lifecycle
       ...this.getStateFromProps(props)
     };
@@ -62,12 +65,10 @@ class Settings extends React.Component {
     let teamState = {
       primaryPaymentMethodId: null,
       paymentMethods: [],
-      subscription: null,
     };
     if(props.currentTeam) {
       teamState.primaryPaymentMethodId = props.currentTeam.primary_payment_method_id;
       teamState.paymentMethods = props.currentTeam.payment_methods;
-      teamState.subscription = props.currentTeam.primary_subscription;
     }
     return {
       ...teamState,
@@ -124,12 +125,20 @@ class Settings extends React.Component {
     });
   }
 
+  handleOnClickChangeSubscriptionPlanButton(e) {
+    this.setState({isSubscriptionPlanModalVisible: true});
+  }
+
   handleOnChangePrimaryPaymentMethod(id, e) {
     this.setState({primaryPaymentMethodId: id});
   }
 
   handleOnCancelPaymentMethodModal() {
     this.setState({isPaymentMethodModalVisible: false});
+  }
+
+  handleOnCloseSubscriptionPlanModal(newSubscriptionPlanId) {
+    this.setState({isSubscriptionPlanModalVisible: false});
   }
 
   handleOnAddPaymentMethodModal(payload) {
@@ -139,7 +148,6 @@ class Settings extends React.Component {
   }
 
   handleOnClickRemovePaymentMethodButton(paymentMethodId) {
-    this.setState({isPaymentMethodModalVisible: false});
     this.context.executeAction(teamActions.removePaymentMethod, {
       payment_method_id: paymentMethodId,
     });
@@ -201,6 +209,17 @@ class Settings extends React.Component {
     return <PaymentMethodModal {...paymentMethodModalProps} />;
   }
 
+  renderSubscriptionPlanModal() {
+    if(!this.state.isSubscriptionPlanModalVisible) {return;}
+    let {currentSubscription} = this.props;
+    let subscriptionPlanModalProps = {
+      subscriptionId: currentSubscription.id,
+      selectedSubscriptionPlanId: currentSubscription.subscription_plan_id,
+      onClose: this.handleOnCloseSubscriptionPlanModal.bind(this)
+    };
+    return <SubscriptionPlanModal {...subscriptionPlanModalProps} />;
+  }
+
   renderActionButtons(isEditing, isLoading, clickHandlerArg) {
     let editButtonProps = {
       className: css(styles.editButton),
@@ -232,8 +251,8 @@ class Settings extends React.Component {
   }
 
   render() {
-    let {email, name, subscription, isEditingUserSettings, isEditingTeamSettings} = this.state;
-    let {updateUserRequestState, updateUserRequestError, addPaymentMethodTeamRequestState, addPaymentMethodTeamRequestError, updateTeamRequestState, updateTeamRequestError} = this.props;
+    let {email, name, isEditingUserSettings, isEditingTeamSettings} = this.state;
+    let {currentSubscription, updateUserRequestState, updateUserRequestError, addPaymentMethodTeamRequestState, addPaymentMethodTeamRequestError, updateTeamRequestState, updateTeamRequestError} = this.props;
     let emailInputProps = {
       className: css(styles.input),
       id: 'email',
@@ -253,6 +272,16 @@ class Settings extends React.Component {
     let addNewPaymentMethodButtonProps = {
       className: css(styles.addNewPaymentMethodButton),
       onClick: this.handleOnClickAddNewPaymentMethodButton.bind(this)
+    };
+    let changePlanButtonProps = {
+      className: css(styles.changePlanButton),
+      onClick: this.handleOnClickChangeSubscriptionPlanButton.bind(this)
+    };
+    let subscriptionPlanInputProps = {
+      className: css(styles.subscriptionPlanInput),
+      type: 'text',
+      disabled: true,
+      value: `${currentSubscription.subscription_plan.name} - ${currentSubscription.subscription_plan.price_per_month_text}`,
     };
     return (
       <div className={css(styles.Settings)}>
@@ -285,9 +314,11 @@ class Settings extends React.Component {
         </fieldset>
         <fieldset>
           <label>Current Subscription Plan</label>
-          <input type="text" disabled={true} value={`${subscription.subscription_plan.name} - ${subscription.subscription_plan.amount_text}`} />
+          <input {...subscriptionPlanInputProps} />
+          {isEditingTeamSettings ? <button {...changePlanButtonProps}>Change plan</button> : null}
         </fieldset>
         {this.renderPaymentMethodModal()}
+        {this.renderSubscriptionPlanModal()}
       </div>
     );
   }
@@ -295,7 +326,7 @@ class Settings extends React.Component {
 
 export let undecorated = Settings;
 
-Settings = connectToStores(Settings, [TeamsStore, UsersStore], (context, props) => {
+Settings = connectToStores(Settings, [SubscriptionsStore, TeamsStore, UsersStore], (context, props) => {
   let teamsStore = context.getStore(TeamsStore);
   let usersStore = context.getStore(UsersStore);
   let {state: addPaymentMethodTeamRequestState, error: addPaymentMethodTeamRequestError} = teamsStore.getEventData('ADD_PAYMENT_METHOD');
@@ -308,6 +339,7 @@ Settings = connectToStores(Settings, [TeamsStore, UsersStore], (context, props) 
     updateTeamRequestError,
     updateUserRequestState,
     updateUserRequestError,
+    currentSubscription: context.getStore(SubscriptionsStore).getCurrentSubscription(),
     currentTeam: teamsStore.getCurrentTeam(),
     currentUser: usersStore.getCurrentUser(),
   };

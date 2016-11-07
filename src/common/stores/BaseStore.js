@@ -18,20 +18,25 @@ export function registerHandlers(Store) {
   if(!Store.baseEventName) {throw new Error('baseEventName must be defined');}
   for(let event in Store.handlers) {
     let handlerName = Store.handlers[event];
-    let [t, action, state] = event.replace(Store.baseEventName, '').match(/^_(.*)_(START|SUCCESS|FAILURE)$/);
-    let dynamicHandler = `handle${_.upperFirst(_.camelCase(action))}${_.startCase(state.toLowerCase())}`;
-    let definedHandler;
-    if(handlerName !== 'baseHandler') {
-      definedHandler = Store.prototype[handlerName];
-    }
-    Store.prototype[dynamicHandler] = function baseHandler(payload) {
-      this.logEventState(action, EventStateToRequestStateMap[state], (payload ? payload.error : null));
-      if(definedHandler) {
-        definedHandler.call(this, payload);
+    let matches = event.replace(Store.baseEventName, '').match(/^_(.*)_(START|SUCCESS|FAILURE)$/);
+    if(!matches) {
+      Store.handlers[event] = Store.prototype[handlerName];
+    } else {
+      let [t, action, state] = matches;
+      let dynamicHandler = `handle${_.upperFirst(_.camelCase(action))}${_.startCase(state.toLowerCase())}`;
+      let definedHandler;
+      if(handlerName !== 'baseHandler') {
+        definedHandler = Store.prototype[handlerName];
       }
-      this.emitChange();
-    };
-    Store.handlers[event] = dynamicHandler;
+      Store.prototype[dynamicHandler] = function baseHandler(payload) {
+        this.logEventState(action, EventStateToRequestStateMap[state], (payload ? payload.error : null));
+        if(definedHandler) {
+          definedHandler.call(this, payload);
+        }
+        this.emitChange();
+      };
+      Store.handlers[event] = dynamicHandler;
+    }
   }
   return Store;
 }
@@ -39,6 +44,7 @@ export function registerHandlers(Store) {
 class BaseStore extends FluxibleBaseStore {
   static handlers = {};
   static baseEventName = '';
+  static modelClass = null;
 
   constructor(dispatcher) {
     super(dispatcher);

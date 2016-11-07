@@ -1,8 +1,9 @@
 import {StyleSheet} from 'aphrodite/no-important';
 import colors from '../../lib/colors';
-import {clearfix} from '../../lib/mixins';
+import {clearfix, checkboxStyles} from '../../lib/mixins';
 
 const styles = StyleSheet.create({
+  ...checkboxStyles,
   subscriptionPlanModal: {},
   subscriptionPlanModalContents: {
     position: 'relative',
@@ -25,6 +26,18 @@ const styles = StyleSheet.create({
     width: '30px',
     height: '30px',
   },
+  subscriptionPlanList: {
+    padding: '15px 0',
+  },
+  subscriptionPlan: {
+    margin: '0 0 10px',
+  },
+  subscriptionPlanSummary: {
+    display: 'inline-block',
+    lineHeight: '20px',
+    verticalAlign: 'middle',
+    marginTop: '3px',
+  },
   continueButton: {
     display: 'block',
     width: '100%',
@@ -33,6 +46,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.jellyBean,
     color: '#ffffff',
     fontSize: '16px'
+  },
+  cancelButton: {
+    display: 'block',
+    color: colors.black35,
+    textAlign: 'center',
+    fontWeight: 400,
+    margin: '10px auto 0',
   },
   error: {
     display: 'block',

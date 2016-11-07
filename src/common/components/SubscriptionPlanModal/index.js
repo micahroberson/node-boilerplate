@@ -1,6 +1,12 @@
 import React from 'react';
+import connectToStores from 'fluxible-addons-react/connectToStores';
 import {css} from 'aphrodite/no-important';
 import shouldComponentUpdatePure from '../../lib/shouldComponentUpdatePure';
+import {RequestStates} from '../../stores/BaseStore';
+import SubscriptionPlansStore from '../../stores/SubscriptionPlansStore';
+import SubscriptionsStore from '../../stores/SubscriptionsStore';
+import subscriptionPlanActions from '../../actions/subscriptionPlanActions';
+import subscriptionActions from '../../actions/subscriptionActions';
 import Modal from '../Modal';
 import menuClosePng from '../../images/button_menu_close.png';
 import menuCloseSvg from '../../images/button_menu_close.svg';
@@ -13,61 +19,96 @@ class SubscriptionPlanModal extends React.Component {
   };
 
   static propTypes = {
+    subscriptionId: React.PropTypes.string,
     selectedSubscriptionPlanId: React.PropTypes.string,
     subscriptionPlans: React.PropTypes.array,
-    loading: React.PropTypes.bool,
-    error: React.PropTypes.object,
-    onCancel: React.PropTypes.func.isRequired,
-    onSave: React.PropTypes.func.isRequired,
-  };
-
-  static defaultProps = {
-    loading: false,
-    error: null
+    updateSubscriptionRequestState: React.PropTypes.string,
+    updateSubscriptionRequestError: React.PropTypes.object,
+    onClose: React.PropTypes.func.isRequired,
   };
 
   constructor(props) {
     super(props);
-    this.state = this.getStateFromProps(props);
+    this.state = {
+      selectedSubscriptionPlanId: props.selectedSubscriptionPlanId,
+      loading: false,
+    };
   }
 
   shouldComponentUpdate = shouldComponentUpdatePure;
 
-  getStateFromProps(props) {
-    return {
-      error: props.error,
-      loading: props.loading,
-      selectedSubscriptionPlanId: props.selectedSubscriptionPlanId,
-    };
+  componentDidMount() {
+    this.context.executeAction(subscriptionPlanActions.list, {});
   }
 
   componentWillReceiveProps(nextProps) {
-    let {loading, error} = this.props;
-    if(loading !== nextProps.loading) {
-      this.setState({loading: nextProps.loading});
+    if(nextProps.selectedSubscriptionPlanId !== this.props.selectedSubscriptionPlanId) {
+      this.setState({selectedSubscriptionPlanId: nextProps.selectedSubscriptionPlanId});
     }
-    if(error !== nextProps.error) {
-      this.setState({error: nextProps.error});
+    let {updateSubscriptionRequestState} = this.props;
+    if(updateSubscriptionRequestState !== nextProps.updateSubscriptionRequestState
+      && updateSubscriptionRequestState === RequestStates.Started
+      && nextProps.updateSubscriptionRequestState === RequestStates.Success) {
+      this.setState({loading: false});
+      this.props.onClose();
     }
   }
 
   handleOnClickSaveButton(e) {
+    if(this.state.selectedSubscriptionPlanId === this.props.selectedSubscriptionPlanId) {
+      return;
+    }
     this.setState({loading : true});
-    this.props.onSave(this.state.selectedSubscriptionPlanId);
+    this.context.executeAction(subscriptionActions.update, {
+      id: this.props.subscriptionId,
+      subscription_plan_id: this.state.selectedSubscriptionPlanId
+    });
+  }
+
+  handleOnClickCancelButton(e) {
+    this.handleOnCloseModal();
   }
 
   handleOnCloseModal() {
-    this.props.onCancel();
+    this.props.onClose();
+  }
+
+  handleOnChangeSelectedSubscriptionPlan(id, e) {
+    this.setState({selectedSubscriptionPlanId: id});
   }
 
   renderError() {
-    if(!this.state.error) {return null;}
-    return <span className={css(styles.error)}>{this.state.error.message}</span>;
+    if(!this.props.updateSubscriptionRequestError) {return null;}
+    return <span className={css(styles.error)}>{this.props.updateSubscriptionRequestError.message}</span>;
   }
 
-  renderSubscriptionPlans(subscriptionPlans) {
+  renderSubscriptionPlans() {
+    let {subscriptionPlans} = this.props;
+    let {selectedSubscriptionPlanId} = this.state;
     return subscriptionPlans.map((subscriptionPlan) => {
-
+      let checkboxLabelProps = {
+        className: `${css(styles.checkboxLabel)}`,
+        htmlFor: subscriptionPlan.id,
+      };
+      let checkboxInputProps = {
+        className: css(styles.checkboxInput),
+        id: subscriptionPlan.id,
+        type: 'checkbox',
+        checked: subscriptionPlan.id === selectedSubscriptionPlanId,
+        onChange: this.handleOnChangeSelectedSubscriptionPlan.bind(this, subscriptionPlan.id),
+      };
+      let checkboxCheckmarkProps = {
+        className: css(styles.checkboxCheckmark),
+      };
+      return (
+        <div className={css(styles.subscriptionPlan)} key={subscriptionPlan.id}>
+          <label {...checkboxLabelProps}>
+            <input {...checkboxInputProps} />
+            <div {...checkboxCheckmarkProps} />
+          </label>
+          <span className={css(styles.subscriptionPlanSummary)}>{subscriptionPlan.name} - {subscriptionPlan.price_per_month_text}</span>
+        </div>
+      );
     });
   }
 
@@ -79,8 +120,13 @@ class SubscriptionPlanModal extends React.Component {
     };
     let continueButtonProps = {
       className: css(styles.continueButton),
-      disabled: disabled,
-      onClick: this.handleOnClickSaveButton.bind(this)
+      disabled: this.state.loading,
+      onClick: this.handleOnClickSaveButton.bind(this),
+    };
+    let cancelButtonProps = {
+      className: css(styles.cancelButton),
+      disabled: this.state.loading,
+      onClick: this.handleOnClickCancelButton.bind(this),
     };
     let continueButtonText = this.state.loading ? <span className="loadingSpinner" /> : 'Save';
     return (
@@ -92,15 +138,29 @@ class SubscriptionPlanModal extends React.Component {
           <h2 className={css(styles.header)}>Select plan</h2>
           <div>
             {this.renderError()}
-            <div>
-              {this.renderSubscriptionPlans(this.props.subscriptionPlans)}
+            <div className={css(styles.subscriptionPlanList)}>
+              {this.renderSubscriptionPlans()}
             </div>
           </div>
           <button {...continueButtonProps}>{continueButtonText}</button>
+          <button {...cancelButtonProps}>Cancel subscription</button>
         </div>
       </Modal>
     );
   }
 }
+
+export let undecorated = SubscriptionPlanModal;
+
+SubscriptionPlanModal = connectToStores(SubscriptionPlanModal, [SubscriptionPlansStore, SubscriptionsStore], (context, props) => {
+  let subscriptionPlansStore = context.getStore(SubscriptionPlansStore);
+  let subscriptionsStore = context.getStore(SubscriptionsStore);
+  let {state: updateSubscriptionRequestState, error: updateSubscriptionRequestError} = subscriptionsStore.getEventData('UPDATE');
+  return {
+    subscriptionPlans: subscriptionPlansStore.getSubscriptionPlans(),
+    updateSubscriptionRequestState,
+    updateSubscriptionRequestError,
+  };
+});
 
 export default SubscriptionPlanModal
