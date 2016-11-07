@@ -3,6 +3,11 @@ import Promise from 'bluebird';
 import BaseRepository from './BaseRepository';
 import Subscription, {SubscriptionStatuses} from '../../common/models/Subscription';
 
+function unixTimestampToDate(timestamp) {
+  if(!timestamp) {return null;}
+  return new Date(timestamp * 1000);
+}
+
 class SubscriptionsRepository extends BaseRepository {
   static tableName = 'subscriptions';
   static modelClass = Subscription;
@@ -20,14 +25,36 @@ class SubscriptionsRepository extends BaseRepository {
   }
 
   update(subscription, payload) {
-    // If currently trialing, and updating to paid
-    if(subscription.status === SubscriptionStatuses.Trialing && !subscription.subscription_plan && payload.subscription_plan_id) {
-      // Note: Assuming 'id' and 'subscription_plan_id'
-      if(Object.keys(payload).length > 2) {throw new Error('When updating subscription_plan, no other attributes may be updated simultaneously.');}
-      return this.ctx.subscriptionPlansRepository.findById(payload.subscription_plan_id)
+    if(payload.subscription_plan_id) {
+      let findSubscriptionPlan = () => {
+        return this.ctx.subscriptionPlansRepository.findById(payload.subscription_plan_id);
+      };
+      if(payload.subscription_plan_id === subscription.subscription_plan_id) {
+        throw new Error('Subscription is already assigned to the plan provided');
+      }
+      // If currently trialing, and updating to paid
+      if(!subscription.subscription_plan && subscription.status === SubscriptionStatuses.Trialing) {
+        // Note: Assuming 'id' and 'subscription_plan_id'
+        if(Object.keys(payload).length > 2) {throw new Error('When updating subscription_plan, no other attributes may be updated simultaneously.');}
+        return findSubscriptionPlan()
+          .then((subscriptionPlan) => {
+            subscription.subscription_plan = subscriptionPlan;
+            return this._createStripeSubscription(subscription);
+          });
+      }
+      return findSubscriptionPlan()
         .then((subscriptionPlan) => {
-          subscription.subscription_plan = subscriptionPlan;
-          return this._createStripeSubscription(subscription);
+          let stripeSubscriptionParams = {
+            plan: subscriptionPlan.stripe_plan_id,
+            prorate: false, // TODO: Allow/handle prorated changes via receipts
+          };
+          return this.stripe.subscriptions.update(subscription.stripe_subscription_id, stripeSubscriptionParams)
+        })
+        .then((stripeSubscriptionObject) => {
+          return super.update(subscription, {
+            ...this._extractRelevantFieldsFromStripeSubscriptionObject(stripeSubscriptionObject),
+            subscription_plan_id: payload.subscription_plan_id,
+          });
         });
     }
     return super.update(subscription, payload);
@@ -55,15 +82,19 @@ class SubscriptionsRepository extends BaseRepository {
       customer: subscription.team.stripe_customer_id,
       plan: subscription.subscription_plan.stripe_plan_id,
     }).then((stripeSubscriptionObject) => {
-      let updatePayload = {
-        status: stripeSubscriptionObject.status,
-        current_period_start: stripeSubscriptionObject.current_period_start ? new Date(stripeSubscriptionObject.current_period_start * 1000) : null,
-        current_period_end: stripeSubscriptionObject.current_period_end ? new Date(stripeSubscriptionObject.current_period_end * 1000) : null,
-        stripe_subscription_id: stripeSubscriptionObject.id,
-        stripe_subscription_object: stripeSubscriptionObject,
-      };
+      let updatePayload = this._extractRelevantFieldsFromStripeSubscriptionObject(stripeSubscriptionObject);
       return this.update(subscription, updatePayload);
     });
+  }
+
+  _extractRelevantFieldsFromStripeSubscriptionObject(stripeSubscriptionObject) {
+    return {
+      status: stripeSubscriptionObject.status,
+      current_period_start: unixTimestampToDate(stripeSubscriptionObject.current_period_start),
+      current_period_end: unixTimestampToDate(stripeSubscriptionObject.current_period_end),
+      stripe_subscription_id: stripeSubscriptionObject.id,
+      stripe_subscription_object: stripeSubscriptionObject,
+    };
   }
 
   _serializeSubscriptionForSql(subscription) {
