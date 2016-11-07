@@ -90,16 +90,16 @@ class UsersRepository extends BaseRepository {
     return crypto.randomBytes(n).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '');
   }
 
-  _setEncryptedPassword(object) {
-    if(!object.password) {return Promise.resolve(object);}
+  _setEncryptedPassword(obj) {
+    if(!obj.password) {return Promise.resolve(obj);}
     return new Promise((resolve, reject) => {
       bcrypt.genSalt(10, (error, salt) => {
         if(error) {return reject(error);}
-        bcrypt.hash(object.password, salt, (error, encryptedPassword) => {
+        bcrypt.hash(obj.password, salt, (error, encryptedPassword) => {
           if(error) {return reject(error);}
-          object.encrypted_password = encryptedPassword;
-          delete object.password;
-          return resolve(object);
+          obj.encrypted_password = encryptedPassword;
+          delete obj.password;
+          return resolve(obj);
         });
       });
     });

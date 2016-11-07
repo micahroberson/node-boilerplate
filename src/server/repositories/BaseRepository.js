@@ -107,10 +107,10 @@ class BaseRepository {
 
   // Note: relation must be defined in the model in order to determine the foreign_key property
   assignTo(models) {
-    let wasArray = true;
-    if(!Array.isArray(models)) {
+    let wasArray = Array.isArray(models);
+    if(!models || (wasArray && !models.length)) {return Promise.resolve(models);}
+    if(!wasArray) {
       models = [models];
-      wasArray = false;
     }
     // Check first object for relation to current repo's modelClass
     let foreignKey, destinationProperty;
@@ -140,10 +140,10 @@ class BaseRepository {
   }
 
   assignManyTo(models, options={}) {
-    let wasArray = true;
-    if(!Array.isArray(models)) {
+    let wasArray = Array.isArray(models);
+    if(!models || (wasArray && !models.length)) {return Promise.resolve(models);}
+    if(!wasArray) {
       models = [models];
-      wasArray = false;
     }
     // Check first object for relation to current repo's modelClass
     let relation, relationName;
