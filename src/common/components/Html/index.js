@@ -26,7 +26,8 @@ class Html extends React.Component {
           <div id="app" dangerouslySetInnerHTML={{__html: this.props.markup}}></div>
           <script dangerouslySetInnerHTML={{__html: `window.env='${env}';window.cssState=${JSON.stringify(this.props.css.renderedClassNames)};`}} />
           <script dangerouslySetInnerHTML={{__html: this.props.state}} />
-          <script src={bundleSrc} defer></script>
+          <script type="text/javascript" src={bundleSrc} defer></script>
+          <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
         </body>
       </html>
     );
@@ -61,7 +62,7 @@ const BaseCSS = `
   }
   h2 {
     font-size: 30px;
-    line-height: 1.1
+    line-height: 1.1;
     margin: 0 0 20px;
   }
   h3 {
@@ -129,6 +130,9 @@ const BaseCSS = `
     color: #ffffff;
     border-color: ${colors.jellyBean};
   }
+  button:disabled {
+    opacity: 0.7;
+  }
   button:hover {
     opacity: 0.9;
   }
@@ -170,6 +174,10 @@ const BaseCSS = `
     height: 15px;
     display: block;
     margin: 10px auto;
+  }
+  .loadingSpinnerGreen {
+    border-top-color: ${colors.verdigris};
+    border-right-color: ${colors.verdigris};
   }
 
   @-webkit-keyframes loadingSpinner {

@@ -4,7 +4,7 @@ import {Link} from 'react-router';
 import {css} from 'aphrodite/no-important';
 import connectToStores from 'fluxible-addons-react/connectToStores';
 import userActions from '../../actions/userActions';
-import UserStore from '../../stores/UserStore';
+import UsersStore from '../../stores/UsersStore';
 import {RequestStates} from '../../stores/BaseStore';
 import shouldComponentUpdatePure from '../../lib/shouldComponentUpdatePure';
 import styles from './styles';
@@ -28,7 +28,7 @@ const ModeEventMap = {
 class AuthForm extends React.Component {
   static propTypes = {
     requestState: React.PropTypes.string,
-    error: React.PropTypes.object,
+    requestError: React.PropTypes.object,
     mode: React.PropTypes.oneOf(_.values(Modes)),
     passwordResetToken: React.PropTypes.string // If mode == ResetPassword
   };
@@ -144,9 +144,9 @@ class AuthForm extends React.Component {
   }
 
   renderError() {
-    let {requestState, error} = this.props;
-    if(!error) {return;}
-    return <h4 className={css(styles.error)}>{error.message}</h4>;
+    let {requestState, requestError} = this.props;
+    if(!requestError) {return;}
+    return <h4 className={css(styles.error)}>{requestError.message}</h4>;
   }
 
   render() {
@@ -275,11 +275,11 @@ class AuthForm extends React.Component {
 
 export let undecorated = AuthForm;
 
-AuthForm = connectToStores(AuthForm, [UserStore], (context, props) => {
-  let {state, error} = context.getStore(UserStore).getEventData(ModeEventMap[props.mode]);
+AuthForm = connectToStores(AuthForm, [UsersStore], (context, props) => {
+  let {state, error} = context.getStore(UsersStore).getEventData(ModeEventMap[props.mode]);
   return {
     requestState: state,
-    error: error
+    requestError: error
   };
 });
 

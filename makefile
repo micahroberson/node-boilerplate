@@ -18,11 +18,11 @@ install:
 	@npm install
 
 start-development:
-	@node_modules/.bin/pm2 start ./config/pm2/development.json
+	@node_modules/.bin/pm2 start ./config/pm2/development.json $(RUN_ARGS)
 restart-development:
-	@node_modules/.bin/pm2 restart ./config/pm2/development.json
+	@node_modules/.bin/pm2 restart ./config/pm2/development.json $(RUN_ARGS)
 stop-development:
-	@node_modules/.bin/pm2 delete ./config/pm2/development.json
+	@node_modules/.bin/pm2 delete ./config/pm2/development.json $(RUN_ARGS)
 logs-development:
 	@node_modules/.bin/pm2 logs -l $(RUN_ARGS)
 

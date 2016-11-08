@@ -1,8 +1,8 @@
 import BaseStore, {registerHandlers} from './BaseStore';
 import User from '../models/User';
 
-class UserStore extends BaseStore {
-  static storeName = 'UserStore';
+class UsersStore extends BaseStore {
+  static storeName = 'UsersStore';
   static baseEventName = 'USER';
   static handlers = {
     'USER_SIGN_IN_START': 'baseHandler',
@@ -51,6 +51,6 @@ class UserStore extends BaseStore {
   }
 }
 
-UserStore = registerHandlers(UserStore);
+UsersStore = registerHandlers(UsersStore);
 
-export default UserStore;
+export default UsersStore;

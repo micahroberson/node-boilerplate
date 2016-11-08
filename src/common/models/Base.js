@@ -21,7 +21,22 @@ class Base {
     for(let relationName in belongsToRelations) {
       let relation = belongsToRelations[relationName];
       relation.foreign_key = relation.foreign_key || `${relationName}_id`;
-      this[relation.foreign_key] = values[relation.foreign_key] || null;
+      if(values[relation.foreign_key]) {
+        this[relation.foreign_key] = values[relation.foreign_key];
+      } else if(values[relationName] && values[relationName].id) {
+        this[relation.foreign_key] = values[relationName].id;
+      } else {
+        this[relation.foreign_key] = null;
+      }
+    }
+    // Set embeds relations
+    for(let relationName in embedsRelations) {
+      let relation = embedsRelations[relationName];
+      let val = values[relationName] || {};
+      if (!(val instanceof relation.class)) {
+        val = relation.factory ? relation.factory.create(val) : new relation.class(val);
+      }
+      this[`${relationName}`] = val;
     }
 
     for(let key in values) {
@@ -29,13 +44,7 @@ class Base {
       if(!val) {continue;}
 
       let relation;
-      if (relation = embedsRelations[key]) {
-        if (!(val instanceof relation.class)) {
-          val = relation.factory ? relation.factory.create(val) : new relation.class(val);
-        }
-        this[`${key}`] = val;
-      }
-      else if (relation = hasManyRelations[key]) {
+      if (relation = hasManyRelations[key]) {
         this[`${key}`] = val.map(v => {
           if (!(v instanceof relation.class)) {
             v = relation.factory ? relation.factory.create(v) : new relation.class(v);

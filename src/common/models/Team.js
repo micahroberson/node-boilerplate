@@ -25,6 +25,9 @@ class Team extends Base {
       },
       primary_payment_method: {
         class: PaymentMethod
+      },
+      primary_subscription: {
+        class: Subscription
       }
     };
   }

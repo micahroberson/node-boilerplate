@@ -2,6 +2,10 @@ import Promise from 'bluebird';
 import BaseProvider, {BaseProviderClient} from './BaseProvider';
 import pg from 'pg';
 import named from 'node-postgres-named';
+import moment from 'moment';
+
+// Use moment for parsing timestamp-without-timezone
+pg.types.setTypeParser(1114, str => moment.utc(str).toDate());
 
 class PostgresProvider extends BaseProvider {
   connect() {
@@ -11,7 +15,7 @@ class PostgresProvider extends BaseProvider {
       password: this.config.POSTGRES_PASSWORD,
       database: this.config.POSTGRES_DB,
       max: 10,
-      Promise: Promise
+      Promise: Promise,
     });
     return Promise.resolve(null);
   }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 3.7.1 (28215) - http://www.bohemiancoding.com/sketch -->
+    <title>button_menu_close</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="button_menu_close">
+            <rect id="Rectangle-156" fill="#FFFFFF" opacity="0" x="0" y="0" width="30" height="30"></rect>
+            <path d="M14.9852814,13.5710678 L7.91421356,6.5 L6.5,7.91421356 L13.5710678,14.9852814 L6.5,22.0563492 L7.91421356,23.4705627 L14.9852814,16.3994949 L22.0563492,23.4705627 L23.4705627,22.0563492 L16.3994949,14.9852814 L23.4705627,7.91421356 L22.0563492,6.5 L14.9852814,13.5710678 Z" id="Combined-Shape" fill="#000000" opacity="0.35"></path>
+        </g>
+    </g>
+</svg>

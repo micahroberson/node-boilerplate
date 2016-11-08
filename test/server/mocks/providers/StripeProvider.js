@@ -17,6 +17,9 @@ class StripeProviderClient extends BaseProviderClient {
       },
       createSource() {
         return Promise.resolve(StripeCardObject);
+      },
+      update() {
+        return Promise.resolve(StripeCustomerObject);
       }
     };
   }

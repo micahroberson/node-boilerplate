@@ -1,6 +1,7 @@
 import React from 'react';
 import {IndexRoute, Route} from 'react-router';
-import UserStore from '../stores/UserStore';
+import UsersStore from '../stores/UsersStore';
+import TeamsStore from '../stores/TeamsStore';
 import App from './App';
 import Home from './Home';
 import SignIn from './SignIn';
@@ -11,14 +12,20 @@ import Settings from './Settings';
 
 let routes = (componentContext) => {
   let requireAuthentication = (nextState, replace) => {
-    if(!componentContext.getStore(UserStore).getCurrentUser()) {
+    if(!componentContext.getStore(UsersStore).getCurrentUser()) {
       replace('/sign-in');
     }
   };
   let getWrapperComponent = (Handler) => {
     return (props) => {
-      let currentUser = componentContext.getStore(UserStore).getCurrentUser();
-      return <Handler currentUser={currentUser} {...props} />;
+      let currentUser = componentContext.getStore(UsersStore).getCurrentUser();
+      let currentTeam = componentContext.getStore(TeamsStore).getCurrentTeam();
+      let combinedProps = {
+        ...props,
+        currentUser,
+        currentTeam
+      };
+      return <Handler {...combinedProps} />;
     }
   };
   return (

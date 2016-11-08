@@ -2,6 +2,7 @@ import _ from 'lodash';
 import Promise from 'bluebird';
 import bcrypt from 'bcrypt';
 import User from '../../common/models/User';
+import Team from '../../common/models/Team';
 import UserSession from '../../common/models/UserSession';
 import {ParametersInvalidError, UnauthorizedAccessError} from '../lib/errors/APIError';
 
@@ -32,6 +33,18 @@ const usersController = {
       session.user = user;
       return ctx.userSessionsRepository.create(session);
     };
+    let createTeam = (user) => {
+      if(payload.team_id) {return Promise.resolve(user);}
+      let team = new Team({primary_user: user, primary_user_id: user.id});
+      return ctx.teamsRepository.create(team)
+        .then((team) => {
+          return ctx.teamsRepository.createStripeCustomer(team);
+        })
+        .then((team) => {
+          return ctx.usersRepository.update(user, {team_id: team.id});
+        })
+        .return(user);
+    };
     let enqueueSendWelcomeEmailJob = (session) => {
       return ctx.providerClients.bullQueueProviderClient
         .enqueue('SendWelcomeEmail', {user_id: session.user.id})
@@ -47,6 +60,7 @@ const usersController = {
     return ctx.providerClients.postgresProviderClient
       .transaction()
       .then(createUser)
+      .then(createTeam)
       .then(createSessionForUser)
       .then(commit)
       .catch(rollback)
@@ -83,7 +97,6 @@ const usersController = {
   },
 
   update(ctx, payload) {
-    if(ctx.session.user.id !== payload.id) {return Promise.reject(new UnauthorizedAccessError());}
     return ctx.usersRepository.update(ctx.session.user, payload)
       .then((user) => {
         return {user: serializeUser(user)};

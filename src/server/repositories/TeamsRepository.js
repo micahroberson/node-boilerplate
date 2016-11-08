@@ -28,6 +28,22 @@ class TeamsRepository extends BaseRepository {
     });
   }
 
+  update(team, payload) {
+    let updateStripeCustomer = (team) => {
+      if(!payload.primary_payment_method_id) {return team;}
+      return this.ctx.paymentMethodsRepository.findById(team.primary_payment_method_id)
+        .then((paymentMethod) => {
+          return this.stripe.customers.update(team.stripe_customer_id, {
+            default_source: paymentMethod.stripe_card_id
+          });
+        })
+        .return(team);
+    };
+
+    return super.update(team, payload)
+      .then(updateStripeCustomer);
+  }
+
   _serializeTeamForSql(team) {
     return {
       id: team.id,

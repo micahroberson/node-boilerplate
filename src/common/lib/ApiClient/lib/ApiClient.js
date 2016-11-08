@@ -36,7 +36,10 @@ class DelectoryApi {
 
   _prepResources() {
     let resources = {
-      Users         : require('./resources/Users').default
+      SubscriptionPlans: require('./resources/SubscriptionPlans').default,
+      Subscriptions: require('./resources/Subscriptions').default,
+      Teams: require('./resources/Teams').default,
+      Users: require('./resources/Users').default,
     };
     for(let resourceName in resources) {
       this[resourceName[0].toLowerCase() + resourceName.substring(1)] = new resources[resourceName](this);

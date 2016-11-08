@@ -2,6 +2,14 @@ import Base from './Base';
 import Team from './Team';
 import SubscriptionPlan from './SubscriptionPlan';
 
+export const SubscriptionStatuses = {
+  Trialing: 'trialing',
+  Active: 'active',
+  PastDue: 'past_due',
+  Canceled: 'canceled',
+  Unpaid: 'unpaid',
+};
+
 class Subscription extends Base {
   static belongsTo() {
     return {

@@ -22,6 +22,7 @@ let webpackIsomorphicToolsPlugin = new WebpackIsomorphicToolsPlugin(webpackIsomo
 module.exports = {
   entry: {
     app: [
+      'babel-polyfill',
       './src/client/index.js'
     ]
   },
@@ -40,5 +41,5 @@ module.exports = {
     new webpack.NamedModulesPlugin(),
     webpackIsomorphicToolsPlugin
   ],
-  devtool: 'eval-source-map'
+  devtool: '#inline-source-map'
 };

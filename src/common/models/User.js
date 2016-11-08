@@ -1,11 +1,20 @@
 import Base from './Base';
 import Team from './Team';
+import UserPermissions from './UserPermissions';
 
 class User extends Base {
   static belongsTo() {
     return {
       team: {
         class: Team
+      }
+    };
+  }
+
+  static embeds() {
+    return {
+      permissions: {
+        class: UserPermissions
       }
     };
   }

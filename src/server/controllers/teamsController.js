@@ -3,6 +3,8 @@ import Promise from 'bluebird';
 import PaymentMethod from '../../common/models/PaymentMethod';
 import Team from '../../common/models/Team';
 import {serializeUser} from './usersController';
+import {serializeSubscription} from './subscriptionsController';
+import {beginTransaction, commitTransaction, rollbackTransaction} from './helpers';
 import {ParametersInvalidError, UnauthorizedAccessError} from '../lib/errors/APIError';
 
 const teamsController = {
@@ -72,7 +74,25 @@ const teamsController = {
       .catch(rollbackTransaction)
       .then(assignSerializationDependencies)
       .then(serializeResponse);
-  }
+  },
+
+  update(ctx, payload) {
+    if(!ctx.session.user.team_id) {
+      return Promise.reject(new ParametersInvalidError('User does not belong to a team'));
+    }
+    let updateTeam = (team) => {
+      let params = _.pick(payload, ['primary_payment_method_id']);
+      return ctx.teamsRepository.update(team, params);
+    };
+    return ctx.teamsRepository.findById(ctx.session.user.team_id)
+      .bind(ctx)
+      .then(beginTransaction)
+      .then(updateTeam)
+      .then(commitTransaction)
+      .catch(rollbackTransaction)
+      .then(assignSerializationDependencies)
+      .then(serializeResponse);
+  },
 };
 
 export default teamsController;
@@ -86,29 +106,17 @@ function assignSerializationDependencies(team) {
   let assignSubscriptions = (team) => {
     return this.subscriptionsRepository.assignManyTo(team);
   };
+  let assignSubscriptionPlans = (team) => {
+    return this.subscriptionPlansRepository.assignTo(team.subscriptions)
+      .return(team);
+  };
   let assignUsers = (team) => {
     return this.usersRepository.assignManyTo(team);
   };
   return assignPaymentMethods(team)
     .then(assignSubscriptions)
+    .then(assignSubscriptionPlans)
     .then(assignUsers);
-}
-function beginTransaction(team) {
-  return this.providerClients.postgresProviderClient
-    .transaction()
-    .return(team);
-}
-function commitTransaction(team) {
-  return this.providerClients.postgresProviderClient
-    .commit()
-    .return(team);
-}
-function rollbackTransaction(error) {
-  return this.providerClients.postgresProviderClient
-    .rollback()
-    .then(() => {
-      throw error;
-    });
 }
 
 function serializeResponse(team) {
@@ -121,10 +129,13 @@ export function serializeTeam(team) {
     id: team.id,
     name: team.name,
     primary_payment_method_id: team.primary_payment_method_id,
-    primary_user_id: team.primary_user_id
+    primary_user_id: team.primary_user_id,
+    payment_methods: [],
+    primary_subscription: null,
+    users: []
   };
   if(team.subscriptions && team.subscriptions.length) {
-    json.subscription = serializeSubscription(team.subscriptions[0]);
+    json.primary_subscription = serializeSubscription(team.subscriptions[0]); // Sorted via assignManyTo in TeamsRepository
   }
   if(team.payment_methods) {
     json.payment_methods = team.payment_methods.map(pm => serializePaymentMethod(pm));
@@ -142,14 +153,5 @@ export function serializePaymentMethod(paymentMethod) {
     last_four: paymentMethod.last_four,
     expiration_month: paymentMethod.expiration_month,
     expiration_year: paymentMethod.expiration_year
-  };
-}
-
-export function serializeSubscription(subscription) {
-  return {
-    id: subscription.id,
-    status: subscription.status,
-    current_period_start: subscription.current_period_start,
-    current_period_end: subscription.current_period_end
   };
 }
