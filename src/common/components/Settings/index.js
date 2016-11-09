@@ -213,8 +213,8 @@ class Settings extends React.Component {
     if(!this.state.isSubscriptionPlanModalVisible) {return;}
     let {currentSubscription} = this.props;
     let subscriptionPlanModalProps = {
-      subscriptionId: currentSubscription.id,
-      selectedSubscriptionPlanId: currentSubscription.subscription_plan_id,
+      subscriptionId: currentSubscription ? currentSubscription.id : null,
+      selectedSubscriptionPlanId: currentSubscription ? currentSubscription.subscription_plan_id : null,
       onClose: this.handleOnCloseSubscriptionPlanModal.bind(this)
     };
     return <SubscriptionPlanModal {...subscriptionPlanModalProps} />;
@@ -281,7 +281,7 @@ class Settings extends React.Component {
       className: css(styles.subscriptionPlanInput),
       type: 'text',
       disabled: true,
-      value: `${currentSubscription.subscription_plan.name} - ${currentSubscription.subscription_plan.price_per_month_text}`,
+      value: currentSubscription ? `${currentSubscription.subscription_plan.name} - ${currentSubscription.subscription_plan.price_per_month_text}` : `No plan selected`,
     };
     return (
       <div className={css(styles.Settings)}>
