@@ -12,6 +12,7 @@ db-setup:
 	psql -c "CREATE USER node_boilerplate_test WITH PASSWORD 'password'"
 	psql -c "GRANT ALL PRIVILEGES ON DATABASE node_boilerplate TO node_boilerplate"
 	psql -c "GRANT ALL PRIVILEGES ON DATABASE node_boilerplate_test TO node_boilerplate_test"
+	make migrate up
 
 install:
 	@echo "Installing dependencies"
